@@ -195,6 +195,10 @@ GLint bbox_max_uniform;
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
 
+//Funcoes
+void DrawMap();
+
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -354,8 +358,8 @@ int main(int argc, char* argv[])
 
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
-        float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
+        float nearplane = -0.9f;  // Posição do "near plane"
+        float farplane  = -100.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -406,11 +410,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
 
-        // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,-1.1f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
+        DrawMap();
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -450,6 +450,53 @@ int main(int argc, char* argv[])
 
     // Fim do programa
     return 0;
+}
+
+void DrawMap(){
+
+        glm::mat4 model;
+        int numTiles=1;
+        int x = 0;
+
+        for(x=0;x<=numTiles;x++){
+            printf("%d",x);
+
+            int y = 0.0f;
+            float coord_x = y;
+        // Desenhamos o plano do chão
+        model = Matrix_Translate(coord_x,-1.1f,0.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+            x=x++;
+        }
+
+
+
+        // Desenhamos o plano do chão
+        model = Matrix_Translate(2.0f,-1.1f,2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+
+                // Desenhamos o plano do chão
+        model = Matrix_Translate(-2.0f,-1.1f,-2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+
+                        // Desenhamos o plano do chão
+        model = Matrix_Translate(2.0f,-1.1f,-2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+
+                        // Desenhamos o plano do chão
+        model = Matrix_Translate(-2.0f,-1.1f,2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
