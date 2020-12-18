@@ -196,8 +196,17 @@ GLint bbox_max_uniform;
 GLuint g_NumLoadedTextures = 0;
 
 //Funcoes
-void DrawMap();
+void DrawTiles(); //draw all the tiles of floor plane
 
+
+//structs
+struct Tile{
+    int id; //start with 0
+    int origin_shift_x; //value of translation from origin X
+    int origin_shift_y; //value of translation from origin Y
+    int origin_shift_z; //value of translation from origin Z
+};
+void DrawTile(Tile tile);
 
 int main(int argc, char* argv[])
 {
@@ -410,7 +419,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
 
-        DrawMap();
+        DrawTiles();
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -452,7 +461,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void DrawMap(){
+void DrawTiles(){
 
         glm::mat4 model;
         int numTiles=1;
@@ -498,6 +507,8 @@ void DrawMap(){
         DrawVirtualObject("plane");
 
 }
+
+void DrawTile(Tile tile){}
 
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char* filename)
