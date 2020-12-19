@@ -195,18 +195,27 @@ GLint bbox_max_uniform;
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
 
-//Funcoes
-void DrawTiles(); //draw all the tiles of floor plane
-
 
 //structs
+
 struct Tile{
     int id; //start with 0
     int origin_shift_x; //value of translation from origin X
     int origin_shift_y; //value of translation from origin Y
     int origin_shift_z; //value of translation from origin Z
 };
+struct Stage{
+    std::string name;
+
+    std::vector<Tile> tilesArray;
+};
+
+//Funcoes
+Tile newTile();
 void DrawTile(Tile tile);
+void DrawTiles(); //draw all the tiles of floor plane
+Stage newStage();
+void DrawStage();
 
 int main(int argc, char* argv[])
 {
@@ -464,14 +473,16 @@ int main(int argc, char* argv[])
 void DrawTiles(){
 
         glm::mat4 model;
-        int numTiles=1;
-        int x = 0;
+        int numTiles=6;
 
-        for(x=0;x<=numTiles;x++){
-            printf("%d",x);
+        for(int x=0;x<=numTiles;x++){
+         //   printf("%d",x);
 
             int y = 0.0f;
             float coord_x = y;
+
+           // newTile();
+           // DrawTile();
         // Desenhamos o plano do chão
         model = Matrix_Translate(coord_x,-1.1f,0.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -508,7 +519,17 @@ void DrawTiles(){
 
 }
 
-void DrawTile(Tile tile){}
+void DrawTile(Tile tile){ //this function draw tile per tile
+    float model_x = tile.origin_shift_x;
+    float model_y = tile.origin_shift_y; // -1.1f always (?)
+    float model_z = tile.origin_shift_z;
+    glm::mat4 model;
+
+    model = Matrix_Translate(model_x,model_y,model_z);
+    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+    glUniform1i(object_id_uniform, PLANE);
+    DrawVirtualObject("plane");
+}
 
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char* filename)
