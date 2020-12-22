@@ -218,11 +218,16 @@ struct Character{
 //Funcoes
 Tile newTile(int id, float x, float y, float z);
 void DrawTile(Tile tile);
+int getTileIDbyPosition(Stage stage,float x,float y,float z);
+Tile getTilebyTyleID(int id);
 Stage newStage(std::string stageName, std::vector<Tile> tilesArray);
 //void DrawStage(Stage stage);
 Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
 Character newCharacter(int id, Tile position);
+
+//Stages
+Stage stage1 = stage1Creation();
 
 //constantes
 int selectedTile;
@@ -341,7 +346,7 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    Stage stage1 = stage1Creation();
+    //Stage stage1 = stage1Creation();
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -517,8 +522,8 @@ Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
 
     float floorBase = -1.1f;
 
-    int total_linhas = 4;
-    int total_colunas = 4;
+    int total_linhas = 8;
+    int total_colunas = 8;
 
     std::vector<Tile> tileVector;
     int currentLastTileId;
@@ -541,7 +546,7 @@ Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
 Character newCharacter(int id, Tile position){
     Character character;
     character.id = id;
-    character.position = Tile;
+    character.position = position;
 
     return character;
 }
@@ -567,7 +572,25 @@ void DrawTiles(Stage stage){
         }
 }
 
+int getTileIDbyPosition(Stage stage,float x,float y,float z){
+    int tileID=-1;
 
+    int totalTiles = stage.totalTiles;
+    for(int i=0;i<totalTiles;i++){
+        if(x==stage.tilesArray[i].origin_shift_x&&z==stage.tilesArray[i].origin_shift_z){
+            tileID=i;
+        }
+    }
+    if(tileID==-1){
+        printf("ERROR: NAO FOI ENCONTRADO TILE ID NESSA COORDENADA");
+    }
+
+    return tileID;
+}
+
+Tile getTilebyTyleID(Stage stage,int id){
+    return stage.tilesArray[id];
+}
 
 // ***** Atencao *****
 //Daqui pra baixo é função basica
@@ -1280,6 +1303,47 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_X && action == GLFW_PRESS)
     {
         g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+
+    }
+
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+        int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x+2.0f,currentTile.origin_shift_y,currentTile.origin_shift_z);
+
+        if(newTileId != -1){
+            selectedTile = newTileId;
+        }
+    }
+
+    if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+        int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x-2.0f,currentTile.origin_shift_y,currentTile.origin_shift_z);
+
+        if(newTileId != -1){
+            selectedTile = newTileId;
+        }
+    }
+
+    if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    {
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+        int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2.0f);
+
+        if(newTileId != -1){
+            selectedTile = newTileId;
+        }
+    }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    {
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+        int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2.0f);
+
+        if(newTileId != -1){
+            selectedTile = newTileId;
+        }
     }
 
     if (key == GLFW_KEY_Y && action == GLFW_PRESS)
@@ -1301,11 +1365,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_ForearmAngleZ = 0.0f;
         g_TorsoPositionX = 0.0f;
         g_TorsoPositionY = 0.0f;
-
-        selectedTile++;
-        if(selectedTile>stage1lastID){
-            selectedTile=0;
-        }
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
