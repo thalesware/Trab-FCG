@@ -416,23 +416,30 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
 
-        // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f)
+
+        // Desenhamos o modelo do coelho
+   /*     model = Matrix_Translate(1.0f,0.0f,0.0f)
+              * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");*/
+
+        DrawTiles(stage1);
+
+        model = Matrix_Translate(stage1.tilesArray[2].origin_shift_x,0.0f,stage1.tilesArray[2].origin_shift_z);
+        //   * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");
+
+                // Desenhamos o modelo da esfera
+        model = Matrix_Translate(0.0f,0.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, SPHERE);
         DrawVirtualObject("sphere");
-
-        // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f)
-              * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
-
-        DrawTiles(stage1);
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -497,11 +504,24 @@ Stage newStage(std::string stageName, std::vector<Tile> tilesArray){
 return returnedStage;
 }
 
-Stage stage1Creation(){
+Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
 
     float floorBase = -1.1f;
 
+    //map 3x3:
+    int total_linhas = 10;
+    int total_colunas = 10;
 
+    std::vector<Tile> tileVector;
+    int currentLastTileId;
+
+    for(int x=0;x<total_linhas*2;x=x+2){
+        for(int z=0;z<total_colunas*2;z=z+2){
+        currentLastTileId = tileVector.size();
+        Tile aTile = newTile(currentLastTileId,x,floorBase,z);
+        tileVector.push_back(aTile);
+        }
+    }
 
     Tile aTile1 = newTile(0, 0.0f, floorBase, 0.0f); //central
     Tile aTile2 = newTile(1, -2.0f, floorBase, -2.0f); //superior esquerdo
@@ -513,7 +533,9 @@ Stage stage1Creation(){
     Tile aTile8 = newTile(7, -2.0f, floorBase, 2.0f); //inferior esquerdo
     Tile aTile9 = newTile(8, -2.0f, floorBase, 0.0f); //esquerdo
 
-    std::vector<Tile> tileVector={aTile1,aTile2,aTile3,aTile4,aTile5, aTile6,aTile7,aTile8, aTile9};
+    Tile aTile10 = newTile(9, -4.0f, floorBase, -4.0f); // superior esquerdo
+
+   // tileVector={aTile1,aTile2,aTile3,aTile4,aTile5, aTile6,aTile7,aTile8, aTile9,aTile10};
 
     Stage stage1=newStage("stage1",tileVector);
 
