@@ -206,6 +206,7 @@ struct Tile{
 };
 struct Stage{
     std::string name;
+    int totalTiles;
 
     std::vector<Tile> tilesArray;
 };
@@ -213,9 +214,10 @@ struct Stage{
 //Funcoes
 Tile newTile();
 void DrawTile(Tile tile);
-void DrawTiles(); //draw all the tiles of floor plane
 Stage newStage();
-void DrawStage();
+//void DrawStage(Stage stage);
+Stage stage1Creation();
+void DrawTiles(Stage stage); //draw all the tiles of floor plane
 
 int main(int argc, char* argv[])
 {
@@ -330,6 +332,8 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
+    Stage stage1 = stage1Creation();
+
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
@@ -428,7 +432,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
 
-        DrawTiles();
+        DrawTiles(stage1);
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -470,54 +474,52 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void DrawTiles(){
+Tile newTile(int id, float x, float y, float z){ //função para criar um Tile novo
 
-        glm::mat4 model;
-        int numTiles=6;
+    Tile returnedTile;
 
-        for(int x=0;x<=numTiles;x++){
-         //   printf("%d",x);
+    returnedTile.id = id;
+    returnedTile.origin_shift_x=x;
+    returnedTile.origin_shift_y=y;
+    returnedTile.origin_shift_z=z;
 
-            int y = 0.0f;
-            float coord_x = y;
-
-           // newTile();
-           // DrawTile();
-        // Desenhamos o plano do chão
-        model = Matrix_Translate(coord_x,-1.1f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-            x=x++;
-        }
-
-
-
-        // Desenhamos o plano do chão
-        model = Matrix_Translate(2.0f,-1.1f,2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
-                // Desenhamos o plano do chão
-        model = Matrix_Translate(-2.0f,-1.1f,-2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
-                        // Desenhamos o plano do chão
-        model = Matrix_Translate(2.0f,-1.1f,-2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
-                        // Desenhamos o plano do chão
-        model = Matrix_Translate(-2.0f,-1.1f,2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
+    return returnedTile;
 }
+
+Stage newStage(std::string stageName, std::vector<Tile> tilesArray){
+
+    Stage returnedStage;
+
+    returnedStage.name = stageName;
+    returnedStage.tilesArray = tilesArray;
+    returnedStage.totalTiles = tilesArray.size();
+
+return returnedStage;
+}
+
+Stage stage1Creation(){
+
+    float floorBase = -1.1f;
+
+
+
+    Tile aTile1 = newTile(0, 0.0f, floorBase, 0.0f); //central
+    Tile aTile2 = newTile(1, -2.0f, floorBase, -2.0f); //superior esquerdo
+    Tile aTile3 = newTile(2, 0.0f, floorBase, -2.0f); //superior
+    Tile aTile4 = newTile(3, 2.0f, floorBase, -2.0f); //superior direito
+    Tile aTile5 = newTile(4, 2.0f, floorBase, 0.0f); //direito
+    Tile aTile6 = newTile(5, 2.0f, floorBase, 2.0f); //inferior direito
+    Tile aTile7 = newTile(6, 0.0f, floorBase, 2.0f); //inferior
+    Tile aTile8 = newTile(7, -2.0f, floorBase, 2.0f); //inferior esquerdo
+    Tile aTile9 = newTile(8, -2.0f, floorBase, 0.0f); //esquerdo
+
+    std::vector<Tile> tileVector={aTile1,aTile2,aTile3,aTile4,aTile5, aTile6,aTile7,aTile8, aTile9};
+
+    Stage stage1=newStage("stage1",tileVector);
+
+    return stage1;
+}
+
 
 void DrawTile(Tile tile){ //this function draw tile per tile
     float model_x = tile.origin_shift_x;
@@ -525,11 +527,27 @@ void DrawTile(Tile tile){ //this function draw tile per tile
     float model_z = tile.origin_shift_z;
     glm::mat4 model;
 
-    model = Matrix_Translate(model_x,model_y,model_z);
+    model = Matrix_Translate(model_x,-1.1f,model_z);
     glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
     glUniform1i(object_id_uniform, PLANE);
     DrawVirtualObject("plane");
 }
+
+void DrawTiles(Stage stage){
+
+        int numTiles=stage.totalTiles;
+        for(int x=0;x<numTiles;x++){
+            Tile tileToBeDrawn = stage.tilesArray[x];
+            DrawTile(tileToBeDrawn);
+        }
+}
+
+
+
+// ***** Atencao *****
+//Daqui pra baixo é função basica
+// *******************
+
 
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char* filename)
