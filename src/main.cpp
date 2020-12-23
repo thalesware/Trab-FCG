@@ -214,19 +214,43 @@ struct Stage{
 };
 struct Character{
     int id;
-    Tile position;
+    int tileId;
+
+    int level;
+    std::string name;
+    std::string classType;
+    std::string modelType;
+    std::string element;
+    int hp;
+    int mana;
+
+    int atk;
+    int def;
+    int magicAtk;
+    int magicDef;
+    int agi;
+    int dex;
+    int critical;
+    int luck;
+
+    int jumpPower;
+    int moveRange;
+
+    int attackRange;
 };
 
 //Funcoes
 Tile newTile(int id, float x, float y, float z);
 void DrawTile(Tile tile);
 int getTileIDbyPosition(Stage stage,float x,float y,float z);
-Tile getTilebyTyleID(int id);
+Tile getTilebyTyleID(Stage stage,int id);
 Stage newStage(std::string stageName, std::vector<Tile> tilesArray);
 //void DrawStage(Stage stage);
 Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
-Character newCharacter(int id, Tile position);
+Character newCharacter(int id,int tileID,std::string name,int lvl, std::string classType,std::string modelType, std::string element);
+void drawCharacter(Character character);
+void DrawAllCharacters(Stage stage, std::vector<Character> charsList);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -234,9 +258,16 @@ void TextRendering_TileDeails(GLFWwindow* window);
 //Stages
 Stage stage1 = stage1Creation();
 
+//Characters
+Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,"Citizen","BUNNY","Normal");
+Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,"Warrior","BUNNY","Dark");
+std::vector<Character> bunnies = {bunnyCitizen,bunnyWarrior};
+
 //constantes
 int selectedTile;
 int stage1lastID;
+
+
 
 int main(int argc, char* argv[])
 {
@@ -316,6 +347,7 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
     LoadTextureImage("../../data/unselected.jpg"); // TextureImage2
     LoadTextureImage("../../data/selected.jpg"); // TextureImage3
+    LoadTextureImage("../../data/attack.jpg"); // TextureImage4
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -452,9 +484,23 @@ int main(int argc, char* argv[])
 
         DrawTiles(stage1);
 
-        model = Matrix_Translate(2.0f,0.0f,2.0f);
+      //  model = Matrix_Translate(2.0f,0.0f,2.0f);
      //   model = Matrix_Translate(stage1.tilesArray[selectedTile].origin_shift_x,0.0f,stage1.tilesArray[selectedTile].origin_shift_z);
         //   * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+      //  glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+      //  glUniform1i(object_id_uniform, BUNNY);
+     //   DrawVirtualObject("bunny");
+
+        Tile bunny1Tile = getTilebyTyleID(stage1,bunnyCitizen.tileId);
+        model = Matrix_Translate(bunny1Tile.origin_shift_x,0.0f,bunny1Tile.origin_shift_z);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");
+
+     //   printf("COELHO:");
+      //  printf("%d",bunnyCitizen.position.origin_shift_x);
+
+        model = Matrix_Translate(getTilebyTyleID(stage1,bunnyWarrior.tileId).origin_shift_x,0.0f,getTilebyTyleID(stage1,bunnyWarrior.tileId).origin_shift_z);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
@@ -561,10 +607,30 @@ Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
     return stage1;
 }
 
-Character newCharacter(int id, Tile position){
+Character newCharacter(int id, int tileID,std::string name,int lvl, std::string classType,std::string modelType , std::string element){
     Character character;
     character.id = id;
-    character.position = position;
+    character.tileId = tileID;
+    character.name = name;
+    character.level=lvl;
+    character.classType = classType;
+    character.modelType = modelType;
+    character.element = element;
+
+    character.hp = lvl*10;
+    character.mana = lvl+100;
+    character.atk = lvl*10;
+    character.def = lvl*10;
+    character.magicAtk = lvl*10;
+    character.magicDef = lvl*10;
+    character.dex = lvl*10;
+    character.critical = 1;
+    character.agi = lvl*10;
+    character.luck = lvl+10;
+
+    character.moveRange = 3;
+    character.jumpPower = 1;
+    character.attackRange = 1;
 
     return character;
 }
@@ -576,11 +642,6 @@ void DrawTile(Tile tile){ //this function draw tile per tile
     glm::mat4 model;
 
     model = Matrix_Translate(model_x,-1.1f,model_z);
-
-    //testing
-    //if(tile.id==2){
-    //    model = Matrix_Translate(model_x,-0.1f,model_z);
-    //}
 
     if(tile.id == selectedTile){
         tile.selected=true;
@@ -608,6 +669,18 @@ void DrawTiles(Stage stage){
             DrawTile(tileToBeDrawn);
         }
 }
+
+void drawCharacter(Character character){
+    glm::mat4 model;
+    model = Matrix_Translate(getTilebyTyleID(stage1,character.tileId).origin_shift_x,0.0f,getTilebyTyleID(stage1,character.tileId).origin_shift_z);
+    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+    if(character.modelType == "BUNNY"){
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");
+    }
+
+}
+
 
 int getTileIDbyPosition(Stage stage,float x,float y,float z){
     int tileID=-1;
@@ -788,6 +861,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
     glUseProgram(0);
 }
 
