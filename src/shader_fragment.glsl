@@ -23,6 +23,8 @@ uniform mat4 projection;
 #define BUNNY  1
 #define PLANE  2
 #define SELECTEDPLANE 3
+#define ATTACKPLANE 4
+#define MOVEPLANE 5
 
 uniform int object_id;
 
@@ -123,13 +125,7 @@ void main()
         U = (position_model.x - minx)/(maxx - minx);
         V = (position_model.y - miny)/(maxy - miny);
     }
-    else if ( object_id == PLANE )
-    {
-        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-        U = texcoords.x;
-        V = texcoords.y;
-    }
-    else if ( object_id == SELECTEDPLANE )
+    else if ( object_id == PLANE || object_id == SELECTEDPLANE || object_id == ATTACKPLANE || object_id == MOVEPLANE)
     {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
         U = texcoords.x;
@@ -140,10 +136,10 @@ void main()
     vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
     vec3 Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
 
-    vec3 Kd2 = texture(TextureImage2, vec2(U,V)).rgb;
-    vec3 Kd3 = texture(TextureImage3, vec2(U,V)).rgb;
-    vec3 Kd4 = texture(TextureImage4, vec2(U,V)).rgb;
-    vec3 Kd5 = texture(TextureImage5, vec2(U,V)).rgb;
+    vec3 Kd2 = texture(TextureImage2, vec2(U,V)).rgb;//unselected
+    vec3 Kd3 = texture(TextureImage3, vec2(U,V)).rgb;//selected
+    vec3 Kd4 = texture(TextureImage4, vec2(U,V)).rgb;//attack
+    vec3 Kd5 = texture(TextureImage5, vec2(U,V)).rgb;//move
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
@@ -155,6 +151,12 @@ void main()
     }
     if(object_id == SELECTEDPLANE){
         color = Kd3 * (lambert + 0.01);
+    }
+    if(object_id == ATTACKPLANE){
+        color = Kd4 * (lambert + 0.01);
+    }
+    if(object_id == MOVEPLANE){
+        color = Kd5 * (lambert + 0.01);
     }
 
     if ( object_id == SPHERE )

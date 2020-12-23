@@ -205,6 +205,7 @@ struct Tile{
     int origin_shift_z; //value of translation from origin Z
 
     bool selected;
+    bool movable;
 };
 struct Stage{
     std::string name;
@@ -251,6 +252,8 @@ void DrawTiles(Stage stage); //draw all the tiles of floor plane
 Character newCharacter(int id,int tileID,std::string name,int lvl, std::string classType,std::string modelType, std::string element);
 void drawCharacter(Character character);
 void DrawAllCharacters(std::vector<Character> charsList);
+bool checkIfCharIsOnTile(int tileID);
+void clearAllMovableTiles();
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -267,7 +270,8 @@ std::vector<Character> bunnies = {bunnyCitizen,bunnyWarrior};
 //constantes
 int selectedTile;
 int stage1lastID;
-
+bool movingAction=false;
+int movingCharacterID;
 
 
 int main(int argc, char* argv[])
@@ -367,6 +371,14 @@ int main(int argc, char* argv[])
     ObjModel selectedplanemodel("../../data/selectedplane.obj");
     ComputeNormals(&selectedplanemodel);
     BuildTrianglesAndAddToVirtualScene(&selectedplanemodel);
+
+    ObjModel attackplanemodel("../../data/attackplane.obj");
+    ComputeNormals(&attackplanemodel);
+    BuildTrianglesAndAddToVirtualScene(&attackplanemodel);
+
+    ObjModel moveplanemodel("../../data/moveplane.obj");
+    ComputeNormals(&moveplanemodel);
+    BuildTrianglesAndAddToVirtualScene(&moveplanemodel);
 
     if ( argc > 1 )
     {
@@ -475,6 +487,8 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
         #define SELECTEDPLANE  3
+        #define ATTACKPLANE  4
+        #define MOVEPLANE  5
 
 
         // Desenhamos o modelo do coelho
@@ -572,6 +586,7 @@ Tile newTile(int id, float x, float y, float z){ //função para criar um Tile n
     returnedTile.origin_shift_z=z;
 
     returnedTile.selected = false;
+    returnedTile.movable = false;
 
     return returnedTile;
 }
@@ -659,6 +674,10 @@ void DrawTile(Tile tile){ //this function draw tile per tile
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, SELECTEDPLANE);
         DrawVirtualObject("selectedplane");
+    }else if(tile.movable==true){
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, MOVEPLANE);
+        DrawVirtualObject("moveplane");
     }else{
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANE);
@@ -710,6 +729,27 @@ int getTileIDbyPosition(Stage stage,float x,float y,float z){
 
 Tile getTilebyTyleID(Stage stage,int id){
     return stage.tilesArray[id];
+}
+
+bool checkIfCharIsOnTile(int tileID){
+    bool returningValue = false;
+
+    for(int x=0;x<bunnies.size();x++){
+        if(bunnies[x].tileId == tileID){
+            returningValue = true;
+        }
+    }
+    return returningValue;
+}
+
+void clearAllMovableTiles(){
+    int s_size = stage1.tilesArray.size();
+
+    for(int x=0;x<s_size;x++){
+        if(stage1.tilesArray[x].movable==true){
+            stage1.tilesArray[x].movable=false;
+        }
+    }
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -1572,6 +1612,52 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_ForearmAngleZ = 0.0f;
         g_TorsoPositionX = 0.0f;
         g_TorsoPositionY = 0.0f;
+
+        int range;
+        //MOVEMENT
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+
+        if(movingAction==false){
+            for(int x=0;x<bunnies.size();x++){
+                if(bunnies[x].tileId == selectedTile){
+                    movingAction=true;
+                    movingCharacterID=bunnies[x].id;
+                    stage1.tilesArray[selectedTile].movable=true;//self position must be movable too, right?
+                    range = bunnies[x].moveRange;
+                    int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(north != -1){
+                        if(checkIfCharIsOnTile(north)==false){
+                            stage1.tilesArray[north].movable = true;
+                        }
+                    }
+                    int south = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(south != -1){
+                        if(checkIfCharIsOnTile(south)==false){
+                        stage1.tilesArray[south].movable = true;
+                        }
+                    }
+                    int east = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(east != -1){
+                        if(checkIfCharIsOnTile(east)==false){
+                        stage1.tilesArray[east].movable = true;
+                        }
+                    }
+                    int west = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(west != -1){
+                        if(checkIfCharIsOnTile(west)==false){
+                        stage1.tilesArray[west].movable = true;
+                        }
+                    }
+                }
+            }
+        }else{//movingACTION == true
+            if(currentTile.movable==true){
+                bunnies[movingCharacterID].tileId=selectedTile;
+                clearAllMovableTiles();
+                movingAction=false;
+            }
+        }
+
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
