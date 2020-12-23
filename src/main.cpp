@@ -203,6 +203,8 @@ struct Tile{
     int origin_shift_x; //value of translation from origin X
     int origin_shift_y; //value of translation from origin Y
     int origin_shift_z; //value of translation from origin Z
+
+    bool selected;
 };
 struct Stage{
     std::string name;
@@ -307,8 +309,10 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
 
     // Carregamos duas imagens para serem utilizadas como textura
-    LoadTextureImage("../../data/selected.jpg");      // TextureImage0
+    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
     LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
+    LoadTextureImage("../../data/unselected.jpg"); // TextureImage2
+    LoadTextureImage("../../data/selected.jpg"); // TextureImage3
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -322,6 +326,10 @@ int main(int argc, char* argv[])
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
+
+    ObjModel selectedplanemodel("../../data/selectedplane.obj");
+    ComputeNormals(&selectedplanemodel);
+    BuildTrianglesAndAddToVirtualScene(&selectedplanemodel);
 
     if ( argc > 1 )
     {
@@ -429,6 +437,7 @@ int main(int argc, char* argv[])
         #define SPHERE 0
         #define BUNNY  1
         #define PLANE  2
+        #define SELECTEDPLANE  3
 
 
         // Desenhamos o modelo do coelho
@@ -440,7 +449,8 @@ int main(int argc, char* argv[])
 
         DrawTiles(stage1);
 
-        model = Matrix_Translate(stage1.tilesArray[selectedTile].origin_shift_x,0.0f,stage1.tilesArray[selectedTile].origin_shift_z);
+        model = Matrix_Translate(2.0f,0.0f,2.0f);
+     //   model = Matrix_Translate(stage1.tilesArray[selectedTile].origin_shift_x,0.0f,stage1.tilesArray[selectedTile].origin_shift_z);
         //   * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
@@ -504,6 +514,8 @@ Tile newTile(int id, float x, float y, float z){ //função para criar um Tile n
     returnedTile.origin_shift_y=y;
     returnedTile.origin_shift_z=z;
 
+    returnedTile.selected = false;
+
     return returnedTile;
 }
 
@@ -558,9 +570,28 @@ void DrawTile(Tile tile){ //this function draw tile per tile
     glm::mat4 model;
 
     model = Matrix_Translate(model_x,-1.1f,model_z);
-    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-    glUniform1i(object_id_uniform, PLANE);
-    DrawVirtualObject("plane");
+
+    //testing
+    //if(tile.id==2){
+    //    model = Matrix_Translate(model_x,-0.1f,model_z);
+    //}
+
+    if(tile.id == selectedTile){
+        tile.selected=true;
+    }
+    else{
+        tile.selected=false;
+    }
+
+    if(tile.selected==true){
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, SELECTEDPLANE);
+        DrawVirtualObject("selectedplane");
+    }else{
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANE);
+        DrawVirtualObject("plane");
+    }
 }
 
 void DrawTiles(Stage stage){
@@ -730,6 +761,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage0"), 0);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
     glUseProgram(0);
 }
 
