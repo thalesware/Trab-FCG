@@ -228,6 +228,9 @@ Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
 Character newCharacter(int id, Tile position);
 
+//TextRendering - Custom Functions
+void TextRendering_TileDeails(GLFWwindow* window);
+
 //Stages
 Stage stage1 = stage1Creation();
 
@@ -479,6 +482,9 @@ int main(int argc, char* argv[])
         // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
         TextRendering_ShowProjection(window);
 
+        //function to show details of the Tile
+        TextRendering_TileDeails(window);
+
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
         TextRendering_ShowFramesPerSecond(window);
@@ -621,6 +627,26 @@ int getTileIDbyPosition(Stage stage,float x,float y,float z){
 
 Tile getTilebyTyleID(Stage stage,int id){
     return stage.tilesArray[id];
+}
+
+void TextRendering_TileDeails(GLFWwindow* window){
+    if ( !g_ShowInfoText )
+        return;
+
+    float pad = TextRendering_LineHeight(window);
+
+    char buffer[80];
+    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
+
+    float x,y,z;
+    x = getTilebyTyleID(stage1,selectedTile).origin_shift_x;
+    y = getTilebyTyleID(stage1,selectedTile).origin_shift_y;
+    z = getTilebyTyleID(stage1,selectedTile).origin_shift_z;
+
+    char buffer2[80];
+    snprintf(buffer2, 80, "Tile ID = %d, X=%.2f, Y=%.2f, Z=%.2f",selectedTile,x,y,z);
+
+    TextRendering_PrintString(window, buffer2, -1.0f+pad/10, 1.0f-10*pad/10, 1.0f);
 }
 
 // ***** Atencao *****
