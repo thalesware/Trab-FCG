@@ -1624,6 +1624,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
                     movingCharacterID=bunnies[x].id;
                     stage1.tilesArray[selectedTile].movable=true;//self position must be movable too, right?
                     range = bunnies[x].moveRange;
+
+                    if(range==1){
                     int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
                     if(north != -1){
                         if(checkIfCharIsOnTile(north)==false){
@@ -1647,6 +1649,233 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
                         if(checkIfCharIsOnTile(west)==false){
                         stage1.tilesArray[west].movable = true;
                         }
+                    }
+                    }
+                    else if(range==2){
+                        int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(north != -1){
+                        if(checkIfCharIsOnTile(north)==false){
+                            stage1.tilesArray[north].movable = true;
+                        }
+                    }
+                    int south = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(south != -1){
+                        if(checkIfCharIsOnTile(south)==false){
+                        stage1.tilesArray[south].movable = true;
+                        }
+                    }
+                    int east = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(east != -1){
+                        if(checkIfCharIsOnTile(east)==false){
+                        stage1.tilesArray[east].movable = true;
+                        }
+                    }
+                    int west = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(west != -1){
+                        if(checkIfCharIsOnTile(west)==false){
+                        stage1.tilesArray[west].movable = true;
+                        }
+                    } //range1 part
+
+                    int northwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(northwest!=-1){
+                        if(checkIfCharIsOnTile(northwest)==false){
+                            stage1.tilesArray[northwest].movable=true;
+                        }
+                    }
+                    int northeast = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(northeast!=-1){
+                        if(checkIfCharIsOnTile(northeast)==false){
+                            stage1.tilesArray[northeast].movable=true;
+                        }
+                    }
+                    int southeast = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(southeast!=-1){
+                        if(checkIfCharIsOnTile(southeast)==false){
+                            stage1.tilesArray[southeast].movable=true;
+                        }
+                    }
+                    int southwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(southwest!=-1){
+                        if(checkIfCharIsOnTile(southwest)==false){
+                            stage1.tilesArray[southwest].movable=true;
+                        }
+                    }
+                    int northnorth = getTileIDbyPosition(stage1, currentTile.origin_shift_x+4,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(northnorth!=-1){
+                        if(checkIfCharIsOnTile(northnorth)==false){
+                            stage1.tilesArray[northnorth].movable=true;
+                        }
+                    }
+                    int southsouth = getTileIDbyPosition(stage1, currentTile.origin_shift_x-4,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(southsouth!=-1){
+                        if(checkIfCharIsOnTile(southsouth)==false){
+                            stage1.tilesArray[southsouth].movable=true;
+                        }
+                    }
+                    int easteast = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+4);
+                    if(easteast!=-1){
+                        if(checkIfCharIsOnTile(easteast)==false){
+                            stage1.tilesArray[easteast].movable=true;
+                        }
+                    }
+                    int westwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-4);
+                    if(westwest!=-1){
+                        if(checkIfCharIsOnTile(westwest)==false){
+                            stage1.tilesArray[westwest].movable=true;
+                        }
+                    }//range2 part
+
+                    }
+                    else if(range==3){
+                             int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(north != -1){
+                        if(checkIfCharIsOnTile(north)==false){
+                            stage1.tilesArray[north].movable = true;
+                        }
+                    }
+                    int south = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(south != -1){
+                        if(checkIfCharIsOnTile(south)==false){
+                        stage1.tilesArray[south].movable = true;
+                        }
+                    }
+                    int east = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(east != -1){
+                        if(checkIfCharIsOnTile(east)==false){
+                        stage1.tilesArray[east].movable = true;
+                        }
+                    }
+                    int west = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(west != -1){
+                        if(checkIfCharIsOnTile(west)==false){
+                        stage1.tilesArray[west].movable = true;
+                        }
+                    } //range1 part
+
+                    int northwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(northwest!=-1){
+                        if(checkIfCharIsOnTile(northwest)==false){
+                            stage1.tilesArray[northwest].movable=true;
+                        }
+                    }
+                    int northeast = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(northeast!=-1){
+                        if(checkIfCharIsOnTile(northeast)==false){
+                            stage1.tilesArray[northeast].movable=true;
+                        }
+                    }
+                    int southeast = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(southeast!=-1){
+                        if(checkIfCharIsOnTile(southeast)==false){
+                            stage1.tilesArray[southeast].movable=true;
+                        }
+                    }
+                    int southwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(southwest!=-1){
+                        if(checkIfCharIsOnTile(southwest)==false){
+                            stage1.tilesArray[southwest].movable=true;
+                        }
+                    }
+                    int northnorth = getTileIDbyPosition(stage1, currentTile.origin_shift_x+4,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(northnorth!=-1){
+                        if(checkIfCharIsOnTile(northnorth)==false){
+                            stage1.tilesArray[northnorth].movable=true;
+                        }
+                    }
+                    int southsouth = getTileIDbyPosition(stage1, currentTile.origin_shift_x-4,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(southsouth!=-1){
+                        if(checkIfCharIsOnTile(southsouth)==false){
+                            stage1.tilesArray[southsouth].movable=true;
+                        }
+                    }
+                    int easteast = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+4);
+                    if(easteast!=-1){
+                        if(checkIfCharIsOnTile(easteast)==false){
+                            stage1.tilesArray[easteast].movable=true;
+                        }
+                    }
+                    int westwest = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-4);
+                    if(westwest!=-1){
+                        if(checkIfCharIsOnTile(westwest)==false){
+                            stage1.tilesArray[westwest].movable=true;
+                        }
+                    }//range2 part
+
+                    int nne = getTileIDbyPosition(stage1, currentTile.origin_shift_x+4,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(nne!=-1){
+                        if(checkIfCharIsOnTile(nne)==false){
+                            stage1.tilesArray[nne].movable=true;
+                        }
+                    }
+                    int nee = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z+4);
+                    if(nee!=-1){
+                        if(checkIfCharIsOnTile(nee)==false){
+                            stage1.tilesArray[nee].movable=true;
+                        }
+                    }
+                    int see = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z+4);
+                    if(see!=-1){
+                        if(checkIfCharIsOnTile(see)==false){
+                            stage1.tilesArray[see].movable=true;
+                        }
+                    }
+                    int sse = getTileIDbyPosition(stage1, currentTile.origin_shift_x-4,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                    if(sse!=-1){
+                        if(checkIfCharIsOnTile(sse)==false){
+                            stage1.tilesArray[sse].movable=true;
+                        }
+                    }
+                    int ssw = getTileIDbyPosition(stage1, currentTile.origin_shift_x-4,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(ssw!=-1){
+                        if(checkIfCharIsOnTile(ssw)==false){
+                            stage1.tilesArray[ssw].movable=true;
+                        }
+                    }
+                    int sww = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z-4);
+                    if(sww!=-1){
+                        if(checkIfCharIsOnTile(sww)==false){
+                            stage1.tilesArray[sww].movable=true;
+                        }
+                    }
+                    int nww = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z-4);
+                    if(nww!=-1){
+                        if(checkIfCharIsOnTile(nww)==false){
+                            stage1.tilesArray[nww].movable=true;
+                        }
+                    }
+                    int nnw = getTileIDbyPosition(stage1, currentTile.origin_shift_x+4,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                    if(nnw!=-1){
+                        if(checkIfCharIsOnTile(nnw)==false){
+                            stage1.tilesArray[nnw].movable=true;
+                        }
+                    }
+                    int nnn = getTileIDbyPosition(stage1, currentTile.origin_shift_x+6,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(nnn!=-1){
+                        if(checkIfCharIsOnTile(nnn)==false){
+                            stage1.tilesArray[nnn].movable=true;
+                        }
+                    }
+                    int eee = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+6);
+                    if(eee!=-1){
+                        if(checkIfCharIsOnTile(eee)==false){
+                            stage1.tilesArray[eee].movable=true;
+                        }
+                    }
+                    int sss = getTileIDbyPosition(stage1, currentTile.origin_shift_x-6,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                    if(sss!=-1){
+                        if(checkIfCharIsOnTile(sss)==false){
+                            stage1.tilesArray[sss].movable=true;
+                        }
+                    }
+                    int www = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-6);
+                    if(www!=-1){
+                        if(checkIfCharIsOnTile(www)==false){
+                            stage1.tilesArray[www].movable=true;
+                        }
+                    }//range3 part
+
+
                     }
                 }
             }
