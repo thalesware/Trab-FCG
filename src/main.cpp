@@ -48,6 +48,22 @@
 #include "utils.h"
 #include "matrices.h"
 
+//range 1 definitions
+#define n_x 2
+#define n_z 0
+
+#define e_x 0
+#define e_z 2
+
+#define s_x -2
+#define s_z 0
+
+#define w_x 0
+#define w_z -2
+//range 1 definitions
+
+
+
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
 struct ObjModel
@@ -206,6 +222,7 @@ struct Tile{
 
     bool selected;
     bool movable;
+    bool attackable;
 };
 struct Stage{
     std::string name;
@@ -254,6 +271,7 @@ void drawCharacter(Character character);
 void DrawAllCharacters(std::vector<Character> charsList);
 bool checkIfCharIsOnTile(int tileID);
 void clearAllMovableTiles();
+void clearAllAttackableTiles();
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -272,6 +290,7 @@ int selectedTile;
 int stage1lastID;
 bool movingAction=false;
 int movingCharacterID;
+bool attackingAction=false;
 
 
 int main(int argc, char* argv[])
@@ -587,6 +606,7 @@ Tile newTile(int id, float x, float y, float z){ //função para criar um Tile n
 
     returnedTile.selected = false;
     returnedTile.movable = false;
+    returnedTile.attackable = false;
 
     return returnedTile;
 }
@@ -606,8 +626,8 @@ Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
 
     float floorBase = -1.1f;
 
-    int total_linhas = 8;
-    int total_colunas = 8;
+    int total_linhas = 10;
+    int total_colunas = 10;
 
     std::vector<Tile> tileVector;
     int currentLastTileId;
@@ -657,7 +677,7 @@ Character newCharacter(int id, int tileID,std::string name,int lvl, std::string 
 
 void DrawTile(Tile tile){ //this function draw tile per tile
     float model_x = tile.origin_shift_x;
-    float model_y = tile.origin_shift_y; // -1.1f always (?)
+    //float model_y = tile.origin_shift_y; // -1.1f always (?)
     float model_z = tile.origin_shift_z;
     glm::mat4 model;
 
@@ -733,8 +753,9 @@ Tile getTilebyTyleID(Stage stage,int id){
 
 bool checkIfCharIsOnTile(int tileID){
     bool returningValue = false;
+    int b_size = bunnies.size();
 
-    for(int x=0;x<bunnies.size();x++){
+    for(int x=0;x<b_size;x++){
         if(bunnies[x].tileId == tileID){
             returningValue = true;
         }
@@ -748,6 +769,16 @@ void clearAllMovableTiles(){
     for(int x=0;x<s_size;x++){
         if(stage1.tilesArray[x].movable==true){
             stage1.tilesArray[x].movable=false;
+        }
+    }
+}
+
+void clearAllAttackableTiles(){
+    int s_size = stage1.tilesArray.size();
+
+    for(int x=0;x<s_size;x++){
+        if(stage1.tilesArray[x].attackable==true){
+            stage1.tilesArray[x].attackable=false;
         }
     }
 }
@@ -1553,6 +1584,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     }
 
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
+        //attack moves
+
+    }
+
+
     if (key == GLFW_KEY_W && action == GLFW_PRESS)
     {
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
@@ -1618,7 +1655,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
 
         if(movingAction==false){
-            for(int x=0;x<bunnies.size();x++){
+            int b_size = bunnies.size();
+            for(int x=0;x<b_size;x++){
                 if(bunnies[x].tileId == selectedTile){
                     movingAction=true;
                     movingCharacterID=bunnies[x].id;
