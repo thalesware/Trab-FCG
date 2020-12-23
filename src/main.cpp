@@ -250,10 +250,11 @@ Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
 Character newCharacter(int id,int tileID,std::string name,int lvl, std::string classType,std::string modelType, std::string element);
 void drawCharacter(Character character);
-void DrawAllCharacters(Stage stage, std::vector<Character> charsList);
+void DrawAllCharacters(std::vector<Character> charsList);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
+void TextRendering_CharacterDeails(GLFWwindow* window);
 
 //Stages
 Stage stage1 = stage1Creation();
@@ -348,6 +349,7 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/unselected.jpg"); // TextureImage2
     LoadTextureImage("../../data/selected.jpg"); // TextureImage3
     LoadTextureImage("../../data/attack.jpg"); // TextureImage4
+    LoadTextureImage("../../data/move.jpg"); // TextureImage5
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -483,6 +485,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("bunny");*/
 
         DrawTiles(stage1);
+        DrawAllCharacters(bunnies);
 
       //  model = Matrix_Translate(2.0f,0.0f,2.0f);
      //   model = Matrix_Translate(stage1.tilesArray[selectedTile].origin_shift_x,0.0f,stage1.tilesArray[selectedTile].origin_shift_z);
@@ -490,20 +493,20 @@ int main(int argc, char* argv[])
       //  glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
       //  glUniform1i(object_id_uniform, BUNNY);
      //   DrawVirtualObject("bunny");
-
+/*
         Tile bunny1Tile = getTilebyTyleID(stage1,bunnyCitizen.tileId);
         model = Matrix_Translate(bunny1Tile.origin_shift_x,0.0f,bunny1Tile.origin_shift_z);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        DrawVirtualObject("bunny");*/
 
      //   printf("COELHO:");
       //  printf("%d",bunnyCitizen.position.origin_shift_x);
-
+/*
         model = Matrix_Translate(getTilebyTyleID(stage1,bunnyWarrior.tileId).origin_shift_x,0.0f,getTilebyTyleID(stage1,bunnyWarrior.tileId).origin_shift_z);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        DrawVirtualObject("bunny");*/
 
                 // Desenhamos o modelo da esfera
         model = Matrix_Translate(0.0f,0.0f,0.0f)
@@ -528,8 +531,10 @@ int main(int argc, char* argv[])
         // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
         TextRendering_ShowProjection(window);
 
-        //function to show details of the Tile
+        //function to show details of the Tile and Characters
         TextRendering_TileDeails(window);
+        TextRendering_CharacterDeails(window);
+
 
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
@@ -617,14 +622,14 @@ Character newCharacter(int id, int tileID,std::string name,int lvl, std::string 
     character.modelType = modelType;
     character.element = element;
 
-    character.hp = lvl*10;
+    character.hp = 100+lvl*10;
     character.mana = lvl+100;
     character.atk = lvl*10;
     character.def = lvl*10;
     character.magicAtk = lvl*10;
     character.magicDef = lvl*10;
     character.dex = lvl*10;
-    character.critical = 1;
+    character.critical = 2;
     character.agi = lvl*10;
     character.luck = lvl+10;
 
@@ -662,7 +667,6 @@ void DrawTile(Tile tile){ //this function draw tile per tile
 }
 
 void DrawTiles(Stage stage){
-
         int numTiles=stage.totalTiles;
         for(int x=0;x<numTiles;x++){
             Tile tileToBeDrawn = stage.tilesArray[x];
@@ -681,6 +685,12 @@ void drawCharacter(Character character){
 
 }
 
+void DrawAllCharacters(std::vector <Character> charList){
+    int listSize = charList.size();
+    for(int x=0;x<listSize;x++){
+        drawCharacter(charList[x]);
+    }
+}
 
 int getTileIDbyPosition(Stage stage,float x,float y,float z){
     int tileID=-1;
@@ -708,18 +718,82 @@ void TextRendering_TileDeails(GLFWwindow* window){
 
     float pad = TextRendering_LineHeight(window);
 
-    char buffer[80];
-    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-
     float x,y,z;
     x = getTilebyTyleID(stage1,selectedTile).origin_shift_x;
     y = getTilebyTyleID(stage1,selectedTile).origin_shift_y;
     z = getTilebyTyleID(stage1,selectedTile).origin_shift_z;
 
-    char buffer2[80];
-    snprintf(buffer2, 80, "Tile ID = %d, X=%.2f, Y=%.2f, Z=%.2f",selectedTile,x,y,z);
+    char buffer[80];
+    snprintf(buffer, 80, "Tile ID = %d, X=%.2f, Y=%.2f, Z=%.2f",selectedTile,x,y,z);
 
-    TextRendering_PrintString(window, buffer2, -1.0f+pad/10, 1.0f-10*pad/10, 1.0f);
+    TextRendering_PrintString(window, buffer, -1.0f+pad/10, 1.0f-10*pad/10, 1.0f);
+}
+
+void TextRendering_CharacterDeails(GLFWwindow* window){
+    if ( !g_ShowInfoText )
+        return;
+
+    float pad = TextRendering_LineHeight(window);
+
+    char buffer[80];
+    int charListSize = bunnies.size();
+
+    char buffer2[80];
+
+    char atkBuffer[10];
+    char defBuffer[10];
+    char magicAtkBuffer[10];
+    char magicDefBuffer[10];
+    char dexBuffer[10];
+    char agiBuffer[10];
+    char luckBuffer[10];
+    char critBuffer[10];
+
+    for(int x=0;x<charListSize;x++){
+        if(bunnies[x].tileId == selectedTile){
+            int nameLenght=bunnies[x].name.length();
+            char charName[nameLenght+1];
+            strcpy(charName, bunnies[x].name.c_str());
+
+            int elementLenght=bunnies[x].element.length();
+            char charElement[elementLenght+1];
+            strcpy(charElement, bunnies[x].element.c_str());
+
+            int classLenght=bunnies[x].classType.length();
+            char charClass[classLenght+1];
+            strcpy(charClass, bunnies[x].classType.c_str());
+
+            snprintf(buffer, 80,"%s - Lvl = %d, Hp = %d, Mana = %d, Type: %s",charName,bunnies[x].level,bunnies[x].hp,bunnies[x].mana, charElement);
+            snprintf(buffer2, 80,"Class: %s - Move: %d, Jump: %d, Range: %d",charClass,bunnies[x].moveRange,bunnies[x].jumpPower,bunnies[x].attackRange);
+
+            TextRendering_PrintString(window, buffer, -1.0f+pad/10, 1.0f-20*pad/10, 1.0f);
+            TextRendering_PrintString(window, buffer2, -1.0f+pad/10, 1.0f-30*pad/10, 1.0f);
+
+            snprintf(atkBuffer,10,"Atk: %d",bunnies[x].atk);
+            TextRendering_PrintString(window, atkBuffer, -1.0f+pad/10, 1.0f-40*pad/10, 1.0f);
+
+            snprintf(defBuffer,10,"Def: %d",bunnies[x].def);
+            TextRendering_PrintString(window, defBuffer, -1.0f+pad/10, 1.0f-50*pad/10, 1.0f);
+
+            snprintf(magicAtkBuffer,10,"M.Atk: %d",bunnies[x].magicAtk);
+            TextRendering_PrintString(window, magicAtkBuffer, -1.0f+pad/10, 1.0f-60*pad/10, 1.0f);
+
+            snprintf(magicDefBuffer,10,"M.Def: %d",bunnies[x].magicDef);
+            TextRendering_PrintString(window, magicDefBuffer, -1.0f+pad/10, 1.0f-70*pad/10, 1.0f);
+
+            snprintf(agiBuffer,10,"Agi: %d",bunnies[x].agi);
+            TextRendering_PrintString(window, agiBuffer, -1.0f+pad/10, 1.0f-80*pad/10, 1.0f);
+
+            snprintf(dexBuffer,10,"Dex: %d",bunnies[x].dex);
+            TextRendering_PrintString(window, dexBuffer, -1.0f+pad/10, 1.0f-90*pad/10, 1.0f);
+
+            snprintf(luckBuffer,10,"Luck: %d",bunnies[x].luck);
+            TextRendering_PrintString(window, luckBuffer, -1.0f+pad/10, 1.0f-100*pad/10, 1.0f);
+
+            snprintf(critBuffer,10,"Crit: %d%%",bunnies[x].critical);
+            TextRendering_PrintString(window, critBuffer, -1.0f+pad/10, 1.0f-110*pad/10, 1.0f);
+        }
+    }
 }
 
 // ***** Atencao *****
@@ -862,6 +936,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage5"), 5);
     glUseProgram(0);
 }
 
