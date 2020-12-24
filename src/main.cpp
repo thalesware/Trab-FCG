@@ -263,6 +263,7 @@ void DrawTile(Tile tile);
 int getTileIDbyPosition(Stage stage,float x,float y,float z);
 Tile getTilebyTyleID(Stage stage,int id);
 Stage newStage(std::string stageName, std::vector<Tile> tilesArray);
+int getCharIDbyTile(int tileID);
 //void DrawStage(Stage stage);
 Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
@@ -283,7 +284,8 @@ Stage stage1 = stage1Creation();
 //Characters
 Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,"Citizen","BUNNY","Normal");
 Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,"Warrior","BUNNY","Dark");
-std::vector<Character> bunnies = {bunnyCitizen,bunnyWarrior};
+Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,"Cleric","BUNNY","Light");
+std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric};
 
 //constantes
 int selectedTile;
@@ -291,6 +293,9 @@ int stage1lastID;
 bool movingAction=false;
 int movingCharacterID;
 bool attackingAction=false;
+int attackingCharacterID=-1;
+bool engaging=false;
+int defenderID;
 
 
 int main(int argc, char* argv[])
@@ -518,7 +523,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("bunny");*/
 
         DrawTiles(stage1);
-        DrawAllCharacters(bunnies);
+        DrawAllCharacters(stage1Characters);
 
       //  model = Matrix_Translate(2.0f,0.0f,2.0f);
      //   model = Matrix_Translate(stage1.tilesArray[selectedTile].origin_shift_x,0.0f,stage1.tilesArray[selectedTile].origin_shift_z);
@@ -698,6 +703,10 @@ void DrawTile(Tile tile){ //this function draw tile per tile
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, MOVEPLANE);
         DrawVirtualObject("moveplane");
+    }else if(tile.attackable==true){
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ATTACKPLANE);
+        DrawVirtualObject("attackplane");
     }else{
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANE);
@@ -751,12 +760,23 @@ Tile getTilebyTyleID(Stage stage,int id){
     return stage.tilesArray[id];
 }
 
+int getCharIDbyTile(int tileID){
+    int charID=-1;
+    int c_size = stage1Characters.size();
+    for(int x=0;x<c_size;x++){
+        if(stage1Characters[x].tileId==tileID){
+            charID=stage1Characters[x].id;
+        }
+    }
+    return charID;
+}
+
 bool checkIfCharIsOnTile(int tileID){
     bool returningValue = false;
-    int b_size = bunnies.size();
+    int b_size = stage1Characters.size();
 
     for(int x=0;x<b_size;x++){
-        if(bunnies[x].tileId == tileID){
+        if(stage1Characters[x].tileId == tileID){
             returningValue = true;
         }
     }
@@ -807,7 +827,7 @@ void TextRendering_CharacterDeails(GLFWwindow* window){
     float pad = TextRendering_LineHeight(window);
 
     char buffer[80];
-    int charListSize = bunnies.size();
+    int charListSize = stage1Characters.size();
 
     char buffer2[80];
 
@@ -821,47 +841,47 @@ void TextRendering_CharacterDeails(GLFWwindow* window){
     char critBuffer[10];
 
     for(int x=0;x<charListSize;x++){
-        if(bunnies[x].tileId == selectedTile){
-            int nameLenght=bunnies[x].name.length();
+        if(stage1Characters[x].tileId == selectedTile){
+            int nameLenght=stage1Characters[x].name.length();
             char charName[nameLenght+1];
-            strcpy(charName, bunnies[x].name.c_str());
+            strcpy(charName, stage1Characters[x].name.c_str());
 
-            int elementLenght=bunnies[x].element.length();
+            int elementLenght=stage1Characters[x].element.length();
             char charElement[elementLenght+1];
-            strcpy(charElement, bunnies[x].element.c_str());
+            strcpy(charElement, stage1Characters[x].element.c_str());
 
-            int classLenght=bunnies[x].classType.length();
+            int classLenght=stage1Characters[x].classType.length();
             char charClass[classLenght+1];
-            strcpy(charClass, bunnies[x].classType.c_str());
+            strcpy(charClass, stage1Characters[x].classType.c_str());
 
-            snprintf(buffer, 80,"%s - Lvl = %d, Hp = %d, Mana = %d, Type: %s",charName,bunnies[x].level,bunnies[x].hp,bunnies[x].mana, charElement);
-            snprintf(buffer2, 80,"Class: %s - Move: %d, Jump: %d, Range: %d",charClass,bunnies[x].moveRange,bunnies[x].jumpPower,bunnies[x].attackRange);
+            snprintf(buffer, 80,"%s - Lvl = %d, Hp = %d, Mana = %d, Type: %s",charName,stage1Characters[x].level,stage1Characters[x].hp,stage1Characters[x].mana, charElement);
+            snprintf(buffer2, 80,"Class: %s - Move: %d, Jump: %d, Range: %d",charClass,stage1Characters[x].moveRange,stage1Characters[x].jumpPower,stage1Characters[x].attackRange);
 
             TextRendering_PrintString(window, buffer, -1.0f+pad/10, 1.0f-20*pad/10, 1.0f);
             TextRendering_PrintString(window, buffer2, -1.0f+pad/10, 1.0f-30*pad/10, 1.0f);
 
-            snprintf(atkBuffer,10,"Atk: %d",bunnies[x].atk);
+            snprintf(atkBuffer,10,"Atk: %d",stage1Characters[x].atk);
             TextRendering_PrintString(window, atkBuffer, -1.0f+pad/10, 1.0f-40*pad/10, 1.0f);
 
-            snprintf(defBuffer,10,"Def: %d",bunnies[x].def);
+            snprintf(defBuffer,10,"Def: %d",stage1Characters[x].def);
             TextRendering_PrintString(window, defBuffer, -1.0f+pad/10, 1.0f-50*pad/10, 1.0f);
 
-            snprintf(magicAtkBuffer,10,"M.Atk: %d",bunnies[x].magicAtk);
+            snprintf(magicAtkBuffer,10,"M.Atk: %d",stage1Characters[x].magicAtk);
             TextRendering_PrintString(window, magicAtkBuffer, -1.0f+pad/10, 1.0f-60*pad/10, 1.0f);
 
-            snprintf(magicDefBuffer,10,"M.Def: %d",bunnies[x].magicDef);
+            snprintf(magicDefBuffer,10,"M.Def: %d",stage1Characters[x].magicDef);
             TextRendering_PrintString(window, magicDefBuffer, -1.0f+pad/10, 1.0f-70*pad/10, 1.0f);
 
-            snprintf(agiBuffer,10,"Agi: %d",bunnies[x].agi);
+            snprintf(agiBuffer,10,"Agi: %d",stage1Characters[x].agi);
             TextRendering_PrintString(window, agiBuffer, -1.0f+pad/10, 1.0f-80*pad/10, 1.0f);
 
-            snprintf(dexBuffer,10,"Dex: %d",bunnies[x].dex);
+            snprintf(dexBuffer,10,"Dex: %d",stage1Characters[x].dex);
             TextRendering_PrintString(window, dexBuffer, -1.0f+pad/10, 1.0f-90*pad/10, 1.0f);
 
-            snprintf(luckBuffer,10,"Luck: %d",bunnies[x].luck);
+            snprintf(luckBuffer,10,"Luck: %d",stage1Characters[x].luck);
             TextRendering_PrintString(window, luckBuffer, -1.0f+pad/10, 1.0f-100*pad/10, 1.0f);
 
-            snprintf(critBuffer,10,"Crit: %d%%",bunnies[x].critical);
+            snprintf(critBuffer,10,"Crit: %d%%",stage1Characters[x].critical);
             TextRendering_PrintString(window, critBuffer, -1.0f+pad/10, 1.0f-110*pad/10, 1.0f);
         }
     }
@@ -1583,14 +1603,74 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
 
     }
-
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
         //attack moves
+        int range;
+        Tile currentTile = getTilebyTyleID(stage1,selectedTile);
+        if(!movingAction){
+        if(attackingAction==false){
+            int c_size = stage1Characters.size();
+            bool foundOneTarget=false;
+            for(int x=0;x<c_size ;x++){
+                if(stage1Characters[x].tileId == selectedTile){
+                    attackingAction = true;
+                    attackingCharacterID=stage1Characters[x].id;
+                    range = stage1Characters[x].attackRange;
+                    if(range == 1){
+                        int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                        if(north != -1){
+                            if(checkIfCharIsOnTile(north)==true){
+                                foundOneTarget=true;
+                                stage1.tilesArray[north].attackable = true;
+                            }
+                        }
+                        int south = getTileIDbyPosition(stage1, currentTile.origin_shift_x-2,currentTile.origin_shift_y,currentTile.origin_shift_z);
+                        if(south != -1){
+                        if(checkIfCharIsOnTile(south)==true){
+                            foundOneTarget=true;
+                            stage1.tilesArray[south].attackable = true;
+                            }
+                        }
+                        int east = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2);
+                        if(east != -1){
+                            if(checkIfCharIsOnTile(east)==true){
+                                foundOneTarget=true;
+                                stage1.tilesArray[east].attackable = true;
+                            }
+                        }
+                        int west = getTileIDbyPosition(stage1, currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2);
+                        if(west != -1){
+                            if(checkIfCharIsOnTile(west)==true){
+                                foundOneTarget=true;
+                                stage1.tilesArray[west].attackable = true;
+                            }
+                        }
+                        }
+                    }
+                    if(!foundOneTarget){
+                        attackingAction=false;
+                    }
+                }
+            }//end of if attacking action ==false
+            else{//attacking action is true
 
+                if(currentTile.attackable==true){ //engage
+                    engaging=true;
+                    defenderID=getCharIDbyTile(selectedTile);
+                    printf("\ndefenderiD = %d\n",defenderID);
+                    clearAllAttackableTiles();
+                    stage1.tilesArray[selectedTile].attackable=true;
+                }else{
+                    clearAllAttackableTiles();
+                    attackingAction=false;
+                    engaging=false;
+                    attackingCharacterID=-1;
+                }
+            }
+        }
     }
 
-
-    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    if ((key == GLFW_KEY_W || key == GLFW_KEY_UP) && action == GLFW_PRESS)
     {
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
         int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x+2.0f,currentTile.origin_shift_y,currentTile.origin_shift_z);
@@ -1599,8 +1679,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             selectedTile = newTileId;
         }
     }
-
-    if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    if ((key == GLFW_KEY_S || key == GLFW_KEY_DOWN) && action == GLFW_PRESS)
     {
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
         int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x-2.0f,currentTile.origin_shift_y,currentTile.origin_shift_z);
@@ -1609,8 +1688,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             selectedTile = newTileId;
         }
     }
-
-    if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    if ((key == GLFW_KEY_D || key == GLFW_KEY_RIGHT) && action == GLFW_PRESS)
     {
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
         int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z+2.0f);
@@ -1619,8 +1697,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             selectedTile = newTileId;
         }
     }
-
-        if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    if ((key == GLFW_KEY_A || key == GLFW_KEY_LEFT) && action == GLFW_PRESS)
     {
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
         int newTileId = getTileIDbyPosition(stage1,currentTile.origin_shift_x,currentTile.origin_shift_y,currentTile.origin_shift_z-2.0f);
@@ -1629,7 +1706,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             selectedTile = newTileId;
         }
     }
-
     if (key == GLFW_KEY_Y && action == GLFW_PRESS)
     {
         g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
@@ -1638,30 +1714,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     {
         g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
     }
-
-    // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        g_AngleX = 0.0f;
-        g_AngleY = 0.0f;
-        g_AngleZ = 0.0f;
-        g_ForearmAngleX = 0.0f;
-        g_ForearmAngleZ = 0.0f;
-        g_TorsoPositionX = 0.0f;
-        g_TorsoPositionY = 0.0f;
-
         int range;
-        //MOVEMENT
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
-
+        if(!attackingAction){
         if(movingAction==false){
-            int b_size = bunnies.size();
-            for(int x=0;x<b_size;x++){
-                if(bunnies[x].tileId == selectedTile){
+            int c_size = stage1Characters.size();
+            for(int x=0;x<c_size ;x++){
+                if(stage1Characters[x].tileId == selectedTile){
                     movingAction=true;
-                    movingCharacterID=bunnies[x].id;
+                    movingCharacterID=stage1Characters[x].id;
                     stage1.tilesArray[selectedTile].movable=true;//self position must be movable too, right?
-                    range = bunnies[x].moveRange;
+                    range = stage1Characters[x].moveRange;
 
                     if(range==1){
                     int north = getTileIDbyPosition(stage1, currentTile.origin_shift_x+2,currentTile.origin_shift_y,currentTile.origin_shift_z);
@@ -1919,12 +1984,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             }
         }else{//movingACTION == true
             if(currentTile.movable==true){
-                bunnies[movingCharacterID].tileId=selectedTile;
+                stage1Characters[movingCharacterID].tileId=selectedTile;
                 clearAllMovableTiles();
                 movingAction=false;
             }
         }
-
+        }
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
@@ -2032,9 +2097,33 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
     float pad = TextRendering_LineHeight(window);
 
     char buffer[80];
-    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
+    char buffer2[80];
+    char engageBuffer[80];
 
+    //snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
+    snprintf(buffer,80,"Objective: Defeat All Enemies!");
     TextRendering_PrintString(window, buffer, -1.0f+pad/10, -1.0f+2*pad/10, 1.0f);
+
+    if(attackingAction==true){
+        if(attackingCharacterID>=0){ //just to ensure that there is an ID at attacking char.
+            int nameLenght=stage1Characters[attackingCharacterID].name.length();
+            char charName[nameLenght+1];
+            strcpy(charName, stage1Characters[attackingCharacterID].name.c_str());
+            snprintf(buffer2, 80, "Attack of %s\n", charName);
+            TextRendering_PrintString(window, buffer2, -1.0f+pad/10, -1.0f+32*pad/10, 1.0f);
+        }
+    }
+    if(engaging==true){
+        int nameLenght=stage1Characters[defenderID].name.length();
+        char charName[nameLenght+1];
+        strcpy(charName, stage1Characters[defenderID].name.c_str());
+
+        snprintf(engageBuffer, 80, "Defense of %s\n, confirm?\n", charName);
+        TextRendering_PrintString(window, engageBuffer, -1.0f+pad/10, -1.0f+22*pad/10, 1.0f);
+    }
+
+
+
 }
 
 // Escrevemos na tela qual matriz de projeção está sendo utilizada.
@@ -2046,7 +2135,11 @@ void TextRendering_ShowProjection(GLFWwindow* window)
     float lineheight = TextRendering_LineHeight(window);
     float charwidth = TextRendering_CharWidth(window);
 
-    if ( g_UsePerspectiveProjection )
+    if( movingAction )
+        TextRendering_PrintString(window, "Moving", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);
+    else if( attackingAction )
+        TextRendering_PrintString(window, "Attacking", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);
+    else if ( g_UsePerspectiveProjection )
         TextRendering_PrintString(window, "Perspective", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);
     else
         TextRendering_PrintString(window, "Orthographic", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);

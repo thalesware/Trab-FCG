@@ -7,19 +7,14 @@
 			<Cursor1 position="55" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\textrendering.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2352" topLine="0" />
-		</Cursor>
-	</File>
 	<File name="src\shader_vertex.glsl" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2210" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\shader_fragment.glsl" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+	<File name="include\matrices.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3347" topLine="19" />
+			<Cursor1 position="69" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src\glad.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -29,27 +24,25 @@
 	</File>
 	<File name="src\main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="23815" topLine="195" />
+			<Cursor1 position="67009" topLine="1528" />
 		</Cursor>
 		<Folding>
-			<Collapse line="53" />
-			<Collapse line="126" />
-			<Collapse line="200" />
-			<Collapse line="206" />
-			<Collapse line="236" />
-			<Collapse line="497" />
-			<Collapse line="509" />
-			<Collapse line="520" />
-			<Collapse line="545" />
-			<Collapse line="568" />
-			<Collapse line="577" />
-			<Collapse line="593" />
-			<Collapse line="1282" />
+			<Collapse line="69" />
+			<Collapse line="142" />
+			<Collapse line="226" />
+			<Collapse line="232" />
+			<Collapse line="733" />
+			<Collapse line="749" />
 		</Folding>
 	</File>
-	<File name="include\matrices.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\shader_fragment.glsl" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="69" topLine="0" />
+			<Cursor1 position="5579" topLine="45" />
+		</Cursor>
+	</File>
+	<File name="src\textrendering.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6725" topLine="192" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
