@@ -273,6 +273,7 @@ void DrawAllCharacters(std::vector<Character> charsList);
 bool checkIfCharIsOnTile(int tileID);
 void clearAllMovableTiles();
 void clearAllAttackableTiles();
+void computeAttack(int attacker,int defender);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -296,7 +297,7 @@ bool attackingAction=false;
 int attackingCharacterID=-1;
 bool engaging=false;
 int defenderID;
-
+std::string lastActionString="";
 
 int main(int argc, char* argv[])
 {
@@ -801,6 +802,18 @@ void clearAllAttackableTiles(){
             stage1.tilesArray[x].attackable=false;
         }
     }
+}
+
+void computeAttack(int attacker,int defender){
+    printf("\nCOMPUTING ATTACK\n");
+
+    Character atkChar = stage1Characters[attacker];
+    Character defChar = stage1Characters[defender];
+
+    int damage = (1+atkChar.atk) - defChar.def;
+
+    stage1Characters[defender].hp = stage1Characters[defender].hp - damage;
+    lastActionString = "Last attack: "+stage1Characters[defender].name+" Lost "+std::to_string(damage)+" health!";
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -1653,7 +1666,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
                 }
             }//end of if attacking action ==false
             else{//attacking action is true
-
                 if(currentTile.attackable==true){ //engage
                     engaging=true;
                     defenderID=getCharIDbyTile(selectedTile);
@@ -1665,6 +1677,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
                     attackingAction=false;
                     engaging=false;
                     attackingCharacterID=-1;
+                    defenderID=-1;
                 }
             }
         }
@@ -1709,6 +1722,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_Y && action == GLFW_PRESS)
     {
         g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+
+        if(engaging){
+            int attacker=attackingCharacterID;
+            int defender=defenderID;
+
+            computeAttack(attacker,defender);
+            engaging=false;
+            clearAllAttackableTiles();
+            attackingAction=false;
+            attackingCharacterID=-1;
+            defenderID=-1;
+        }
     }
     if (key == GLFW_KEY_Z && action == GLFW_PRESS)
     {
@@ -1716,6 +1741,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
+        lastActionString="";
         int range;
         Tile currentTile = getTilebyTyleID(stage1,selectedTile);
         if(!attackingAction){
@@ -2099,6 +2125,7 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
     char buffer[80];
     char buffer2[80];
     char engageBuffer[80];
+    char lastActionBuffer[80];
 
     //snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
     snprintf(buffer,80,"Objective: Defeat All Enemies!");
@@ -2110,7 +2137,7 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
             char charName[nameLenght+1];
             strcpy(charName, stage1Characters[attackingCharacterID].name.c_str());
             snprintf(buffer2, 80, "Attack of %s\n", charName);
-            TextRendering_PrintString(window, buffer2, -1.0f+pad/10, -1.0f+32*pad/10, 1.0f);
+            TextRendering_PrintString(window, buffer2, -1.0f+pad/10, -1.0f+42*pad/10, 1.0f);
         }
     }
     if(engaging==true){
@@ -2118,12 +2145,16 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
         char charName[nameLenght+1];
         strcpy(charName, stage1Characters[defenderID].name.c_str());
 
-        snprintf(engageBuffer, 80, "Defense of %s\n, confirm?\n", charName);
-        TextRendering_PrintString(window, engageBuffer, -1.0f+pad/10, -1.0f+22*pad/10, 1.0f);
+        snprintf(engageBuffer, 80, "Defense of %s\n, confirm? (Y)\n", charName);
+        TextRendering_PrintString(window, engageBuffer, -1.0f+pad/10, -1.0f+32*pad/10, 1.0f);
     }
 
 
-
+    int nameLenght=lastActionString.length();
+    char lastAction[nameLenght+1];
+    strcpy(lastAction, lastActionString.c_str());
+    snprintf(lastActionBuffer, 80, "%s\n", lastAction);
+    TextRendering_PrintString(window, lastActionBuffer, -1.0f+pad/10, -1.0f+22*pad/10, 1.0f);
 }
 
 // Escrevemos na tela qual matriz de projeção está sendo utilizada.
