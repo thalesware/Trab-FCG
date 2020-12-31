@@ -225,10 +225,28 @@ struct Tile{
     bool attackable;
 };
 struct Stage{
+
     std::string name;
     int totalTiles;
 
     std::vector<Tile> tilesArray;
+};
+struct JobClass{
+    std::string className;
+
+    int baseHP;
+    int baseMana;
+    int baseAtk;
+    int baseDef;
+    int baseMagicAtk;
+    int baseMagicDef;
+    int baseAgi;
+    int baseDex;
+    int baseLuck;
+    int baseCritical;
+    int baseJumpPower;
+    int baseMoveRange;
+    int baseAtkRange;
 };
 struct Character{
     int id;
@@ -236,7 +254,7 @@ struct Character{
 
     int level;
     std::string name;
-    std::string classType;
+    JobClass classType;
     std::string modelType;
     std::string element;
     int hp;
@@ -257,6 +275,199 @@ struct Character{
     int attackRange;
 };
 
+JobClass Warrior={
+    "Warrior",
+    6,
+    3,
+    6,
+    6,
+    2,
+    3,
+    4,
+    3,
+    3,
+    5,
+    2,
+    3,
+    1
+};
+JobClass Citizen={
+    /*className=*/"Citizen",
+    /*baseHP=*/4,
+    /*baseMana=*/3,
+    /*baseAtk=*/3,
+    /*baseDef=*/3,
+    /*baseMagicAtk=*/2,
+    /*baseMagicDef=*/3,
+    /*baseAgi=*/4,
+    /*baseDex=*/5,
+    /*baseLuck=*/7,
+    /*baseCritical=*/3,
+    /*baseJumpPower=*/1,
+    /*baseMoveRange=*/2,
+    /*baseAtkRange=*/1
+};
+JobClass Priest={
+    /*className=*/"Priest",
+    /*baseHP=*/5,
+    /*baseMana=*/7,
+    /*baseAtk=*/2,
+    /*baseDef=*/4,
+    /*baseMagicAtk=*/6,
+    /*baseMagicDef=*/7,
+    /*baseAgi=*/3,
+    /*baseDex=*/4,
+    /*baseLuck=*/3,
+    /*baseCritical=*/3,
+    /*baseJumpPower=*/1,
+    /*baseMoveRange=*/2,
+    /*baseAtkRange=*/1
+};
+JobClass Mage={
+    "Mage",
+    4,
+    8,
+    2,
+    3,
+    8,
+    7,
+    4,
+    5,
+    4,
+    2,
+    1,
+    3,
+    1
+};
+JobClass Thief={
+    "Thief",
+    4,
+    3,
+    5,
+    4,
+    3,
+    4,
+    8,
+    7,
+    7,
+    7,
+    2,
+    3,
+    1
+};
+JobClass Berserker={
+    "Berserker",
+    7,
+    2,
+    8,
+    3,
+    2,
+    2,
+    6,
+    6,
+    5,
+    5,
+    2,
+    3,
+    1
+};
+JobClass Archer={
+    "Archer",
+    4,
+    4,
+    6,
+    4,
+    3,
+    3,
+    5,
+    8,
+    7,
+    5,
+    1,
+    2,
+    5
+};
+JobClass Spearman={
+    "Spearman",
+    5,
+    4,
+    6,
+    5,
+    3,
+    4,
+    4,
+    5,
+    4,
+    3,
+    2,
+    3,
+    2
+};
+JobClass Soldier={
+    "Soldier",
+    7,
+    2,
+    4,
+    8,
+    2,
+    5,
+    4,
+    4,
+    3,
+    2,
+    1,
+    3,
+    1
+};
+JobClass Noble={
+    "Noble",
+    5,
+    6,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    6,
+    3,
+    1,
+    3,
+    1
+};
+JobClass Fighter={
+    "Fighter",
+    5,
+    2,
+    6,
+    5,
+    2,
+    4,
+    5,
+    5,
+    3,
+    4,
+    2,
+    3,
+    1
+};
+JobClass Sage={
+    "Sage",
+    6,
+    7,
+    2,
+    5,
+    6,
+    8,
+    4,
+    5,
+    4,
+    2,
+    1,
+    3,
+    1
+};
+
 //Funcoes
 Tile newTile(int id, float x, float y, float z);
 void DrawTile(Tile tile);
@@ -267,7 +478,7 @@ int getCharIDbyTile(int tileID);
 //void DrawStage(Stage stage);
 Stage stage1Creation();
 void DrawTiles(Stage stage); //draw all the tiles of floor plane
-Character newCharacter(int id,int tileID,std::string name,int lvl, std::string classType,std::string modelType, std::string element);
+Character newCharacter(int id,int tileID,std::string name,int lvl, JobClass classType,std::string modelType, std::string element);
 void drawCharacter(Character character);
 void DrawAllCharacters(std::vector<Character> charsList);
 bool checkIfCharIsOnTile(int tileID);
@@ -283,9 +494,9 @@ void TextRendering_CharacterDeails(GLFWwindow* window);
 Stage stage1 = stage1Creation();
 
 //Characters
-Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,"Citizen","BUNNY","Normal");
-Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,"Warrior","BUNNY","Dark");
-Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,"Cleric","BUNNY","Light");
+Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,Citizen,"BUNNY","Normal");
+Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,Warrior,"BUNNY","Dark");
+Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
 std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric};
 
 //constantes
@@ -653,7 +864,7 @@ Stage stage1Creation(){ //x cresce = vai para direita, z cresce = vai para baixo
     return stage1;
 }
 
-Character newCharacter(int id, int tileID,std::string name,int lvl, std::string classType,std::string modelType , std::string element){
+Character newCharacter(int id, int tileID,std::string name,int lvl, JobClass classType,std::string modelType , std::string element){
     Character character;
     character.id = id;
     character.tileId = tileID;
@@ -663,20 +874,21 @@ Character newCharacter(int id, int tileID,std::string name,int lvl, std::string 
     character.modelType = modelType;
     character.element = element;
 
-    character.hp = 100+lvl*10;
-    character.mana = lvl+100;
-    character.atk = lvl*10;
-    character.def = lvl*10;
-    character.magicAtk = lvl*10;
-    character.magicDef = lvl*10;
-    character.dex = lvl*10;
-    character.critical = 2;
-    character.agi = lvl*10;
-    character.luck = lvl+10;
+    character.hp = 100+lvl*10+10*classType.baseHP;
+    character.mana = lvl+100+10*classType.baseMana;
+    character.atk = lvl*10+10*classType.baseAtk;
+    character.def = lvl*10+10*classType.baseDef;
+    character.magicAtk = lvl*10+10*classType.baseMagicAtk;
+    character.magicDef = lvl*10+10*classType.baseMagicDef;
+    character.dex = lvl*10+10*classType.baseDex;
+    character.critical = 2+10*classType.baseCritical;
+    character.agi = lvl*10+10*classType.baseAgi;
+    character.luck = lvl+10+10*classType.baseLuck;
 
-    character.moveRange = 3;
-    character.jumpPower = 1;
-    character.attackRange = 1;
+    character.moveRange = classType.baseMoveRange;
+    character.jumpPower = classType.baseJumpPower;
+    character.attackRange = 1;//TODO: after implement other atk range: classType.baseAtkRange;
+
 
     return character;
 }
@@ -863,9 +1075,9 @@ void TextRendering_CharacterDeails(GLFWwindow* window){
             char charElement[elementLenght+1];
             strcpy(charElement, stage1Characters[x].element.c_str());
 
-            int classLenght=stage1Characters[x].classType.length();
+            int classLenght=stage1Characters[x].classType.className.length();
             char charClass[classLenght+1];
-            strcpy(charClass, stage1Characters[x].classType.c_str());
+            strcpy(charClass, stage1Characters[x].classType.className.c_str());
 
             snprintf(buffer, 80,"%s - Lvl = %d, Hp = %d, Mana = %d, Type: %s",charName,stage1Characters[x].level,stage1Characters[x].hp,stage1Characters[x].mana, charElement);
             snprintf(buffer2, 80,"Class: %s - Move: %d, Jump: %d, Range: %d",charClass,stage1Characters[x].moveRange,stage1Characters[x].jumpPower,stage1Characters[x].attackRange);
