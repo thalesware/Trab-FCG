@@ -467,6 +467,23 @@ JobClass Sage={
     3,
     1
 };
+JobClass Animal={
+    /*className=*/"Animal",
+    /*baseHP=*/6,
+    /*baseMana=*/2,
+    /*baseAtk=*/5,
+    /*baseDef=*/5,
+    /*baseMagicAtk=*/2,
+    /*baseMagicDef=*/4,
+    /*baseAgi=*/6,
+    /*baseDex=*/3,
+    /*baseLuck=*/5,
+    /*baseCritical=*/2,
+    /*baseJumpPower=*/2,
+    /*baseMoveRange=*/3,
+    /*baseAtkRange=*/1
+};
+
 
 //Funcoes
 Tile newTile(int id, float x, float y, float z);
@@ -497,7 +514,9 @@ Stage stage1 = stage1Creation();
 Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,Citizen,"BUNNY","Normal");
 Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,Warrior,"BUNNY","Dark");
 Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
-std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric};
+Character bunnyAnimal=newCharacter(3,stage1.tilesArray[32].id,"Bunny",1,Animal,"BUNNY","Normal");
+
+std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal};
 
 //constantes
 int selectedTile;
@@ -949,7 +968,8 @@ void drawCharacter(Character character){
 void DrawAllCharacters(std::vector <Character> charList){
     int listSize = charList.size();
     for(int x=0;x<listSize;x++){
-        drawCharacter(charList[x]);
+        if(charList[x].level>0)
+            drawCharacter(charList[x]);
     }
 }
 
@@ -1019,13 +1039,39 @@ void clearAllAttackableTiles(){
 void computeAttack(int attacker,int defender){
     printf("\nCOMPUTING ATTACK\n");
 
+    bool criticalDamage=false;
     Character atkChar = stage1Characters[attacker];
     Character defChar = stage1Characters[defender];
+    int luckDifference = std::round((1+atkChar.luck - defChar.luck)/3);
+    if (luckDifference < 0)
+        luckDifference = 0;
 
-    int damage = (1+atkChar.atk) - defChar.def;
+    int dexDifference = std::round((1+atkChar.dex - defChar.dex)/2);
+    if (dexDifference < 0)
+        dexDifference = 0;
+
+    int crit = rand()%100; //number between 0 and 99
+    crit = crit + atkChar.critical;
+    if(crit >= 100){
+        criticalDamage=true;
+    }
+
+    int damage = (1+atkChar.atk) - std::round(defChar.def/1.5) + luckDifference + dexDifference;
+    if(criticalDamage)
+        damage = damage * 2;
+    if(damage<=0){
+        damage = 1;
+    }
 
     stage1Characters[defender].hp = stage1Characters[defender].hp - damage;
+
     lastActionString = "Last attack: "+stage1Characters[defender].name+" Lost "+std::to_string(damage)+" health!";
+    if(criticalDamage)
+        lastActionString = "* CRITICAL HIT! Last attack: "+stage1Characters[defender].name+" Lost "+std::to_string(damage)+" health!";
+
+    if(stage1Characters[defender].hp <= 0){
+        stage1Characters[defender].level = 0;
+    }
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
