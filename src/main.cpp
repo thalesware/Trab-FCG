@@ -483,7 +483,22 @@ JobClass Animal={
     /*baseMoveRange=*/3,
     /*baseAtkRange=*/1
 };
-
+JobClass Plant={
+    /*className=*/"Plant",
+    /*baseHP=*/2,
+    /*baseMana=*/0,
+    /*baseAtk=*/0,
+    /*baseDef=*/2,
+    /*baseMagicAtk=*/0,
+    /*baseMagicDef=*/2,
+    /*baseAgi=*/1,
+    /*baseDex=*/0,
+    /*baseLuck=*/0,
+    /*baseCritical=*/1,
+    /*baseJumpPower=*/0,
+    /*baseMoveRange=*/0,
+    /*baseAtkRange=*/0
+};
 
 //Funcoes
 Tile newTile(int id, float x, float y, float z);
@@ -515,8 +530,9 @@ Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,
 Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,Warrior,"BUNNY","Dark");
 Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
 Character bunnyAnimal=newCharacter(3,stage1.tilesArray[32].id,"Bunny",1,Animal,"BUNNY","Normal");
+Character plant1=newCharacter(4,stage1.tilesArray[1].id,"Plant",1,Plant,"PLANT","Grass");
 
-std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal};
+std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal,plant1};
 
 //constantes
 int selectedTile;
@@ -609,6 +625,7 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/selected.jpg"); // TextureImage3
     LoadTextureImage("../../data/attack.jpg"); // TextureImage4
     LoadTextureImage("../../data/move.jpg"); // TextureImage5
+    LoadTextureImage("../../data/tree_lima.jpg"); // TextureImage6
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -634,6 +651,10 @@ int main(int argc, char* argv[])
     ObjModel moveplanemodel("../../data/moveplane.obj");
     ComputeNormals(&moveplanemodel);
     BuildTrianglesAndAddToVirtualScene(&moveplanemodel);
+
+    ObjModel plant("../../data/plant.obj");
+    ComputeNormals(&plant);
+    BuildTrianglesAndAddToVirtualScene(&plant);
 
     if ( argc > 1 )
     {
@@ -744,6 +765,7 @@ int main(int argc, char* argv[])
         #define SELECTEDPLANE  3
         #define ATTACKPLANE  4
         #define MOVEPLANE  5
+        #define PLANT 6
 
 
         // Desenhamos o modelo do coelho
@@ -956,11 +978,22 @@ void DrawTiles(Stage stage){
 
 void drawCharacter(Character character){
     glm::mat4 model;
-    model = Matrix_Translate(getTilebyTyleID(stage1,character.tileId).origin_shift_x,0.0f,getTilebyTyleID(stage1,character.tileId).origin_shift_z);
-    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+    model = Matrix_Translate(getTilebyTyleID(stage1,character.tileId).origin_shift_x,-0.0f,getTilebyTyleID(stage1,character.tileId).origin_shift_z);
+
     if(character.modelType == "BUNNY"){
+      //  model = model * Matrix_Scale(0.0040f,0.0040f,0.0040f); //Tree size
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
+    }
+    if(character.modelType == "PLANT"){
+        model = model*Matrix_Translate(0,-1.1f,0);
+        model = model * Matrix_Scale(0.0040f,0.0040f,0.0040f); //Tree size
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+
+        glUniform1i(object_id_uniform, PLANT);
+        DrawVirtualObject("plant");
     }
 
 }
@@ -983,7 +1016,7 @@ int getTileIDbyPosition(Stage stage,float x,float y,float z){
         }
     }
     if(tileID==-1){
-        printf("ERROR: NAO FOI ENCONTRADO TILE ID NESSA COORDENADA");
+       // printf("ERROR: NAO FOI ENCONTRADO TILE ID NESSA COORDENADA");
     }
 
     return tileID;
@@ -1037,7 +1070,6 @@ void clearAllAttackableTiles(){
 }
 
 void computeAttack(int attacker,int defender){
-    printf("\nCOMPUTING ATTACK\n");
 
     bool criticalDamage=false;
     Character atkChar = stage1Characters[attacker];
@@ -1299,6 +1331,7 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage5"), 5);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
     glUseProgram(0);
 }
 
@@ -1927,7 +1960,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
                 if(currentTile.attackable==true){ //engage
                     engaging=true;
                     defenderID=getCharIDbyTile(selectedTile);
-                    printf("\ndefenderiD = %d\n",defenderID);
                     clearAllAttackableTiles();
                     stage1.tilesArray[selectedTile].attackable=true;
                 }else{

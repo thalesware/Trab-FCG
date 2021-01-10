@@ -25,6 +25,7 @@ uniform mat4 projection;
 #define SELECTEDPLANE 3
 #define ATTACKPLANE 4
 #define MOVEPLANE 5
+#define PLANT 6
 
 uniform int object_id;
 
@@ -39,6 +40,7 @@ uniform sampler2D TextureImage2;//unselected
 uniform sampler2D TextureImage3;//selected
 uniform sampler2D TextureImage4;//attack
 uniform sampler2D TextureImage5;//move
+uniform sampler2D TextureImage6;//tree
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -140,6 +142,7 @@ void main()
     vec3 Kd3 = texture(TextureImage3, vec2(U,V)).rgb;//selected
     vec3 Kd4 = texture(TextureImage4, vec2(U,V)).rgb;//attack
     vec3 Kd5 = texture(TextureImage5, vec2(U,V)).rgb;//move
+    vec3 Kd6 = texture(TextureImage6, vec2(U,V)).rgb;//tree
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
@@ -159,6 +162,9 @@ void main()
         color = Kd5 * (lambert + 0.01);
     }
 
+    if(object_id == PLANT){
+        color = Kd6 * (lambert + 0.01);
+    }
     if ( object_id == SPHERE )
     {
         color += (Kd1*(1-pow(lambert,0.1)));
