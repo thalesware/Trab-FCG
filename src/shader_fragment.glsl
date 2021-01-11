@@ -26,6 +26,7 @@ uniform mat4 projection;
 #define ATTACKPLANE 4
 #define MOVEPLANE 5
 #define PLANT 6
+#define CAT 7
 
 uniform int object_id;
 
@@ -163,6 +164,22 @@ void main()
     }
 
     if(object_id == PLANT){
+        color = Kd6 * (lambert + 0.01);
+    }
+
+    if(object_id == CAT){
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        U = (position_model.x - minx)/(maxx - minx);
+        V = (position_model.y - miny)/(maxy - miny);
+
         color = Kd6 * (lambert + 0.01);
     }
     if ( object_id == SPHERE )

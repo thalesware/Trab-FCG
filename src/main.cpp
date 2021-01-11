@@ -517,6 +517,7 @@ bool checkIfCharIsOnTile(int tileID);
 void clearAllMovableTiles();
 void clearAllAttackableTiles();
 void computeAttack(int attacker,int defender);
+void levelUpChar(int charIndex);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -531,8 +532,9 @@ Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1
 Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
 Character bunnyAnimal=newCharacter(3,stage1.tilesArray[32].id,"Bunny",1,Animal,"BUNNY","Normal");
 Character plant1=newCharacter(4,stage1.tilesArray[1].id,"Plant",1,Plant,"PLANT","Grass");
+Character catAnimal=newCharacter(5,stage1.tilesArray[40].id,"Cat",1,Animal,"CAT","Normal");
 
-std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal,plant1};
+std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal,plant1,catAnimal};
 
 //constantes
 int selectedTile;
@@ -656,6 +658,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&plant);
     BuildTrianglesAndAddToVirtualScene(&plant);
 
+    ObjModel cat("../../data/cat.obj");
+    ComputeNormals(&cat);
+    BuildTrianglesAndAddToVirtualScene(&cat);
+
     if ( argc > 1 )
     {
         ObjModel model(argv[1]);
@@ -766,6 +772,7 @@ int main(int argc, char* argv[])
         #define ATTACKPLANE  4
         #define MOVEPLANE  5
         #define PLANT 6
+        #define CAT 7
 
 
         // Desenhamos o modelo do coelho
@@ -987,6 +994,15 @@ void drawCharacter(Character character){
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
     }
+    if(character.modelType == "CAT"){
+        model = model*Matrix_Translate(0,-1.0f,0);
+        model = model*Matrix_Rotate_X(-190.0f);
+        model = model * Matrix_Scale(0.0300f,0.0300f,0.0300f); //Cat size
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+
+        glUniform1i(object_id_uniform, CAT);
+        DrawVirtualObject("Cat");
+    }
     if(character.modelType == "PLANT"){
         model = model*Matrix_Translate(0,-1.1f,0);
         model = model * Matrix_Scale(0.0040f,0.0040f,0.0040f); //Tree size
@@ -1043,7 +1059,8 @@ bool checkIfCharIsOnTile(int tileID){
 
     for(int x=0;x<b_size;x++){
         if(stage1Characters[x].tileId == tileID){
-            returningValue = true;
+            if(stage1Characters[x].hp > 0)
+                returningValue = true;
         }
     }
     return returningValue;
@@ -1102,8 +1119,23 @@ void computeAttack(int attacker,int defender){
         lastActionString = "* CRITICAL HIT! Last attack: "+stage1Characters[defender].name+" Lost "+std::to_string(damage)+" health!";
 
     if(stage1Characters[defender].hp <= 0){
+        levelUpChar(attacker);
         stage1Characters[defender].level = 0;
+        stage1Characters[defender].tileId = -1;
     }
+}
+
+void levelUpChar(int charIndex){
+    stage1Characters[charIndex].level +=1;
+    stage1Characters[charIndex].atk += 1+(stage1Characters[charIndex].classType.baseAtk);
+    stage1Characters[charIndex].def += 1+(stage1Characters[charIndex].classType.baseDef);
+    stage1Characters[charIndex].dex += 1+(stage1Characters[charIndex].classType.baseDex);
+    stage1Characters[charIndex].magicAtk += 1+(stage1Characters[charIndex].classType.baseMagicAtk);
+    stage1Characters[charIndex].magicDef += 1+(stage1Characters[charIndex].classType.baseMagicDef);
+    stage1Characters[charIndex].hp += 1+(stage1Characters[charIndex].classType.baseHP);
+    stage1Characters[charIndex].mana += 1+(stage1Characters[charIndex].classType.baseMana);
+    stage1Characters[charIndex].agi += 1+(stage1Characters[charIndex].classType.baseAgi);
+    stage1Characters[charIndex].luck += 1+(stage1Characters[charIndex].classType.baseLuck);
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -1145,6 +1177,9 @@ void TextRendering_CharacterDeails(GLFWwindow* window){
 
     for(int x=0;x<charListSize;x++){
         if(stage1Characters[x].tileId == selectedTile){
+            if(stage1Characters[x].hp<=0){
+                        return;
+            }
             int nameLenght=stage1Characters[x].name.length();
             char charName[nameLenght+1];
             strcpy(charName, stage1Characters[x].name.c_str());
@@ -1917,6 +1952,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             bool foundOneTarget=false;
             for(int x=0;x<c_size ;x++){
                 if(stage1Characters[x].tileId == selectedTile){
+                    if(stage1Characters[x].hp<=0){
+                        return;
+                    }
                     attackingAction = true;
                     attackingCharacterID=stage1Characters[x].id;
                     range = stage1Characters[x].attackRange;
@@ -2039,6 +2077,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             int c_size = stage1Characters.size();
             for(int x=0;x<c_size ;x++){
                 if(stage1Characters[x].tileId == selectedTile){
+                    if(stage1Characters[x].hp<=0){
+                        return;
+                    }
                     movingAction=true;
                     movingCharacterID=stage1Characters[x].id;
                     stage1.tilesArray[selectedTile].movable=true;//self position must be movable too, right?
