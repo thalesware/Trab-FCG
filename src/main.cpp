@@ -533,8 +533,9 @@ Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,P
 Character bunnyAnimal=newCharacter(3,stage1.tilesArray[32].id,"Bunny",1,Animal,"BUNNY","Normal");
 Character plant1=newCharacter(4,stage1.tilesArray[1].id,"Plant",1,Plant,"PLANT","Grass");
 Character catAnimal=newCharacter(5,stage1.tilesArray[40].id,"Cat",1,Animal,"CAT","Normal");
+Character horseAnimal=newCharacter(6,stage1.tilesArray[42].id,"Horse",1,Animal,"HORSE","Dark");
 
-std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal,plant1,catAnimal};
+std::vector<Character> stage1Characters = {bunnyCitizen,bunnyWarrior,bunnyCleric,bunnyAnimal,plant1,catAnimal,horseAnimal};
 
 //constantes
 int selectedTile;
@@ -662,6 +663,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&cat);
     BuildTrianglesAndAddToVirtualScene(&cat);
 
+    ObjModel horse("../../data/Horse.obj");
+    ComputeNormals(&horse);
+    BuildTrianglesAndAddToVirtualScene(&horse);
+
     if ( argc > 1 )
     {
         ObjModel model(argv[1]);
@@ -777,6 +782,7 @@ int main(int argc, char* argv[])
         #define MOVEPLANE  5
         #define PLANT 6
         #define CAT 7
+        #define HORSE 8
 
 
         // Desenhamos o modelo do coelho
@@ -1006,6 +1012,15 @@ void drawCharacter(Character character){
 
         glUniform1i(object_id_uniform, CAT);
         DrawVirtualObject("Cat");
+    }
+        if(character.modelType == "HORSE"){
+        model = model*Matrix_Translate(0,-1.0f,0);
+        //model = model*Matrix_Rotate_X(-1.0f);
+        model = model * Matrix_Scale(0.2800f,0.2800f,0.2800f); //Horse size
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+
+        glUniform1i(object_id_uniform, HORSE);
+        DrawVirtualObject("Horse_(null)");
     }
     if(character.modelType == "PLANT"){
         model = model*Matrix_Translate(0,-1.1f,0);

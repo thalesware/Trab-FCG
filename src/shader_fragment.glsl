@@ -27,6 +27,7 @@ uniform mat4 projection;
 #define MOVEPLANE 5
 #define PLANT 6
 #define CAT 7
+#define HORSE 8
 
 uniform int object_id;
 
@@ -164,6 +165,10 @@ void main()
     }
 
     if(object_id == PLANT){
+        color = Kd6 * (lambert + 0.01);
+    }
+
+    if(object_id == HORSE){
         color = Kd6 * (lambert + 0.01);
     }
 
