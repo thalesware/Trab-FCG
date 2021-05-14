@@ -518,7 +518,7 @@ void clearAllMovableTiles();
 void clearAllAttackableTiles();
 void computeAttack(int attacker,int defender);
 void levelUpChar(int charIndex);
-void moveChar(int posicaoInicial, int posicaoFinal);
+void moveChar(int posicaoInicial, int posicaoFinal, float tempo);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -548,6 +548,7 @@ int attackingCharacterID=-1;
 bool engaging=false;
 bool isMoving=false;
 int defenderID;
+float tempo = 0.0f;
 std::string lastActionString="";
 
 int main(int argc, char* argv[])
@@ -560,6 +561,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "ERROR: glfwInit() failed.\n");
         std::exit(EXIT_FAILURE);
     }
+
 
     // Definimos o callback para impressão de erros da GLFW no terminal
     glfwSetErrorCallback(ErrorCallback);
@@ -697,6 +699,10 @@ int main(int argc, char* argv[])
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
+
+            float agora = glfwGetTime();
+            float deltatime = agora - tempo;
+            tempo = glfwGetTime();
         // Aqui executamos as operações de renderização
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -1159,7 +1165,11 @@ void levelUpChar(int charIndex){
     stage1Characters[charIndex].luck += 1+(stage1Characters[charIndex].classType.baseLuck);
 }
 
-void moveChar(int posicaoInicial, int posicaoFinal){ //bezier
+void moveChar(int posicaoInicial, int posicaoFinal, float tempo){ //bezier
+
+
+    float velocidade = 0.3f;
+    float t=tempo*velocidade;
 
     int movingCharacterID;
     movingCharacterID = getCharIDbyTile(posicaoInicial);
@@ -1172,6 +1182,11 @@ void moveChar(int posicaoInicial, int posicaoFinal){ //bezier
     int y_final = stage1.tilesArray[posicaoFinal].origin_shift_y;
     int z_final = stage1.tilesArray[posicaoFinal].origin_shift_z;
 
+    if (t >= 1.0f){
+        t = 0.0f;
+    }
+    while(t<1.0f){
+    //printf("no while/n , t = %f",t);
     glm::vec4 p1 = glm::vec4(x_inicial,y_inicial,z_inicial,1.0f);
     glm::vec4 p4 = glm::vec4(x_final,y_final,z_final,1.0f);
 
@@ -1179,8 +1194,6 @@ void moveChar(int posicaoInicial, int posicaoFinal){ //bezier
 
     glm::vec4 p2 = glm::vec4(x_inicial+ vetorDiferenca.x / 3,y_inicial,z_inicial + vetorDiferenca.z / 3,1.0f);
     glm::vec4 p3 = glm::vec4(x_inicial+ 2 * vetorDiferenca.x / 3,y_inicial, 2 * z_inicial + vetorDiferenca.z / 3,1.0f);
-
-    float t=0.0f;  //tempo parâmetro t
 
     glm::vec4 c12 = p1 + t * (p2-p1);
     glm::vec4 c23 = p2 + t * (p3-p2);
@@ -1191,6 +1204,17 @@ void moveChar(int posicaoInicial, int posicaoFinal){ //bezier
 
 
 
+            Tile virtualmovingtile = newTile(999,getTilebyTyleID(stage1,stage1Characters[movingCharacterID].tileId).origin_shift_x,getTilebyTyleID(stage1,stage1Characters[movingCharacterID].tileId).origin_shift_y,getTilebyTyleID(stage1,stage1Characters[movingCharacterID].tileId).origin_shift_z);
+            stage1Characters[movingCharacterID].tileId = virtualmovingtile.id;
+            virtualmovingtile.origin_shift_x = c.x;
+            virtualmovingtile.origin_shift_y = c.y;
+            virtualmovingtile.origin_shift_z = c.z;
+
+            drawCharacter(stage1Characters[movingCharacterID]);
+
+        t+=velocidade/30;
+    }
+    //stage1Characters[movingCharacterID].tileId = posicaoInicial;
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -2399,13 +2423,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
                 isMoving = true;
 
-                moveChar(stage1Characters[movingCharacterID].tileId,selectedTile);
+                moveChar(stage1Characters[movingCharacterID].tileId,selectedTile,tempo);
+
+                isMoving = false;
+
 
                 stage1Characters[movingCharacterID].tileId=selectedTile;
                 clearAllMovableTiles();
                 movingAction=false;
 
-                isMoving = false;
+
 
             }
         }
