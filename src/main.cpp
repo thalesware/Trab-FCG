@@ -518,6 +518,7 @@ void clearAllMovableTiles();
 void clearAllAttackableTiles();
 void computeAttack(int attacker,int defender);
 void levelUpChar(int charIndex);
+void moveChar(int posicaoInicial, int posicaoFinal);
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -545,6 +546,7 @@ int movingCharacterID;
 bool attackingAction=false;
 int attackingCharacterID=-1;
 bool engaging=false;
+bool isMoving=false;
 int defenderID;
 std::string lastActionString="";
 
@@ -1155,6 +1157,40 @@ void levelUpChar(int charIndex){
     stage1Characters[charIndex].mana += 1+(stage1Characters[charIndex].classType.baseMana);
     stage1Characters[charIndex].agi += 1+(stage1Characters[charIndex].classType.baseAgi);
     stage1Characters[charIndex].luck += 1+(stage1Characters[charIndex].classType.baseLuck);
+}
+
+void moveChar(int posicaoInicial, int posicaoFinal){ //bezier
+
+    int movingCharacterID;
+    movingCharacterID = getCharIDbyTile(posicaoInicial);
+
+    int x_inicial = stage1.tilesArray[posicaoInicial].origin_shift_x;
+    int y_inicial = stage1.tilesArray[posicaoInicial].origin_shift_y;
+    int z_inicial = stage1.tilesArray[posicaoInicial].origin_shift_z;
+
+    int x_final = stage1.tilesArray[posicaoFinal].origin_shift_x;
+    int y_final = stage1.tilesArray[posicaoFinal].origin_shift_y;
+    int z_final = stage1.tilesArray[posicaoFinal].origin_shift_z;
+
+    glm::vec4 p1 = glm::vec4(x_inicial,y_inicial,z_inicial,1.0f);
+    glm::vec4 p4 = glm::vec4(x_final,y_final,z_final,1.0f);
+
+    glm::vec4 vetorDiferenca = p1 - p4;
+
+    glm::vec4 p2 = glm::vec4(x_inicial+ vetorDiferenca.x / 3,y_inicial,z_inicial + vetorDiferenca.z / 3,1.0f);
+    glm::vec4 p3 = glm::vec4(x_inicial+ 2 * vetorDiferenca.x / 3,y_inicial, 2 * z_inicial + vetorDiferenca.z / 3,1.0f);
+
+    float t=0.0f;  //tempo parâmetro t
+
+    glm::vec4 c12 = p1 + t * (p2-p1);
+    glm::vec4 c23 = p2 + t * (p3-p2);
+    glm::vec4 c34 = p3 + t * (p4-p3);
+    glm::vec4 c123 = c12 + t * (c23 - c12);
+    glm::vec4 c234 = c23 + t * (c34 - c23);
+    glm::vec4 c = c123 + t * (c234 - c123);
+
+
+
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -2360,9 +2396,17 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             }
         }else{//movingACTION == true
             if(currentTile.movable==true){
+
+                isMoving = true;
+
+                moveChar(stage1Characters[movingCharacterID].tileId,selectedTile);
+
                 stage1Characters[movingCharacterID].tileId=selectedTile;
                 clearAllMovableTiles();
                 movingAction=false;
+
+                isMoving = false;
+
             }
         }
         }
