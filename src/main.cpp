@@ -714,7 +714,10 @@ int main(int argc, char* argv[])
         // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
         //
         //           R     G     B     A
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        float red_color = 80.0f / 255.0f;
+        float green_color = 180.0f / 255.0f;
+        float blue_color = 250.0f / 255.0f;
+        glClearColor(red_color, green_color, blue_color, 1.0f);
 
         // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
         // e também resetamos todos os pixels do Z-buffer (depth buffer).
