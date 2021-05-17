@@ -519,6 +519,7 @@ void clearAllAttackableTiles();
 void computeAttack(int attacker,int defender);
 void levelUpChar(int charIndex);
 void moveChar(int posicaoInicial, int posicaoFinal, float tempo);
+void checkwincondition();
 
 //TextRendering - Custom Functions
 void TextRendering_TileDeails(GLFWwindow* window);
@@ -551,6 +552,7 @@ int defenderID;
 float tempo = 0.0f;
 float timeNow = glfwGetTime();
 std::string lastActionString="";
+bool youwinmsg = false;
 
 int main(int argc, char* argv[])
 {
@@ -826,13 +828,13 @@ int main(int argc, char* argv[])
         DrawVirtualObject("bunny");*/
 
                 // Desenhamos o modelo da esfera
-        model = Matrix_Translate(0.0f,0.0f,0.0f)
+   /*     model = Matrix_Translate(0.0f,0.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
+        DrawVirtualObject("sphere");*/
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -870,6 +872,8 @@ int main(int argc, char* argv[])
         // definidas anteriormente usando glfwSet*Callback() serão chamadas
         // pela biblioteca GLFW.
         glfwPollEvents();
+
+        checkwincondition();
     }
 
     // Finalizamos o uso dos recursos do sistema operacional
@@ -1216,6 +1220,21 @@ void moveChar(int posicaoInicial, int posicaoFinal, float tempo){ //bezier
         t+=velocidade/30;
     }
     //stage1Characters[movingCharacterID].tileId = posicaoInicial;
+}
+
+void checkwincondition(){
+    int total_chars = stage1Characters.size();
+    int i = 0;
+    int deads = 0;
+    while(i<total_chars){
+        if(stage1Characters[i].hp<=0){
+            deads++;
+        }
+        if(deads == total_chars-1){
+            youwinmsg = true;
+        }
+        i++;
+    }
 }
 
 void TextRendering_TileDeails(GLFWwindow* window){
@@ -2550,7 +2569,11 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
     char lastActionBuffer[80];
 
     //snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-    snprintf(buffer,80,"Objective: Defeat All Enemies!");
+    if(youwinmsg){
+            snprintf(buffer,80,"CONGRATULATIONS! , YOU WIN!");
+    }else{
+            snprintf(buffer,80,"Objective: Defeat All Enemies!");
+    }
     TextRendering_PrintString(window, buffer, -1.0f+pad/10, -1.0f+2*pad/10, 1.0f);
 
     if(attackingAction==true){
