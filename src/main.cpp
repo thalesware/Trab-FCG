@@ -179,9 +179,9 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraDistance = 3.5f; // Distância da câmera para a origem
+float g_CameraTheta = -45.0f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 45.0f;   // Ângulo em relação ao eixo Y
+float g_CameraDistance = 10.5f; // Distância da câmera para a origem
 
 // Variáveis que controlam rotação do antebraço
 float g_ForearmAngleZ = 0.0f;
@@ -530,9 +530,9 @@ Stage stage1 = stage1Creation();
 //Characters
 Character bunnyCitizen=newCharacter(0,stage1.tilesArray[3].id,"Bunny Citizen",1,Citizen,"BUNNY","Normal");
 Character bunnyWarrior=newCharacter(1,stage1.tilesArray[10].id,"Bunny Warrior",1,Warrior,"BUNNY","Dark");
-Character bunnyCleric=newCharacter(2,stage1.tilesArray[16].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
+Character bunnyCleric=newCharacter(2,stage1.tilesArray[1].id,"Bunny Cleric",1,Priest,"BUNNY","Light");
 Character bunnyAnimal=newCharacter(3,stage1.tilesArray[32].id,"Bunny",1,Animal,"BUNNY","Normal");
-Character plant1=newCharacter(4,stage1.tilesArray[1].id,"Plant",1,Plant,"PLANT","Grass");
+Character plant1=newCharacter(4,stage1.tilesArray[16].id,"Plant",1,Plant,"PLANT","Grass");
 Character catAnimal=newCharacter(5,stage1.tilesArray[40].id,"Cat",1,Animal,"CAT","Normal");
 Character horseAnimal=newCharacter(6,stage1.tilesArray[42].id,"Horse",1,Animal,"HORSE","Dark");
 
@@ -549,6 +549,7 @@ bool engaging=false;
 bool isMoving=false;
 int defenderID;
 float tempo = 0.0f;
+float timeNow = glfwGetTime();
 std::string lastActionString="";
 
 int main(int argc, char* argv[])
